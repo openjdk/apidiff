@@ -62,7 +62,7 @@ $(CLASSDIR) $(BUILDDIR):
 JAR_COPYRIGHT = -C $(TOPDIR) COPYRIGHT
 
 $(IMAGES_DIR)/%.jar: pkgsToFiles.sh
-	$(RM) $@ $(@:$(IMAGES_DIR)/%.jar=$(BUILDDIR)/jarData/%) 
+	$(RM) $@ $(@:$(IMAGES_DIR)/%.jar=$(BUILDDIR)/jarData/%)
 	$(MKDIR) -p $(@D)
 	$(MKDIR) -p $(@:$(IMAGES_DIR)/%.jar=$(BUILDDIR)/jarData/%)
 	( if [ ! -z "$(JAR_MAINCLASS)" ]; then echo "Main-class: $(JAR_MAINCLASS)" ; fi ; \
@@ -87,7 +87,7 @@ $(IMAGES_DIR)/%.jar: pkgsToFiles.sh
 #
 # Build zips with verbose names
 
-%-$(VERBOSE_ZIP_SUFFIX).zip: %.zip 
+%-$(VERBOSE_ZIP_SUFFIX).zip: %.zip
 	ln $(@:%-$(VERBOSE_ZIP_SUFFIX).zip=%.zip) $@
 
 #----------------------------------------------------------------------

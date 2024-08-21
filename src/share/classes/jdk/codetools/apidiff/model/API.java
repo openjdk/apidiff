@@ -536,7 +536,7 @@ public abstract class API {
         /**
          * {@inheritDoc}
          *
-         * @see #getExportedPackageElements(ModuleElement) 
+         * @see #getExportedPackageElements(ModuleElement)
          */
         @Override
         public Set<PackageElement> getPackageElements(ModuleElement m) {

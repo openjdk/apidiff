@@ -46,7 +46,7 @@ SYSTEM_UNAME := $(shell uname)
 ifeq ($(SYSTEM_UNAME), Windows_NT)
 DEV_NULL = NUL
 else
-DEV_NULL = /dev/null 
+DEV_NULL = /dev/null
 endif
 
 ifneq (,$(findstring CYGWIN,$(SYSTEM_UNAME)))

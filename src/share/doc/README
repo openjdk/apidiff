@@ -12,7 +12,7 @@ Release Notes.
 
 System Requirements
 
-The following sections provide the recommended system requirements for running 
+The following sections provide the recommended system requirements for running
 apidiff.
 
 - Java platform
@@ -22,13 +22,13 @@ apidiff.
 
 Files and Directories
 
-Name 	        Description
-README	        This file
-COPYRIGHT 	    Copyright information
+Name            Description
+README          This file
+COPYRIGHT       Copyright information
 LICENSE         License file
 doc/            Documentation files
 legal/          Copyright and license files
-lib/     	    Directory containing the JAR files needed to run apidiff
-bin/ 		    Miscellaneous utility script for use on Linux, macOS, Solaris
-		        and for Cygwin on Microsoft Windows platforms
+lib/            Directory containing the JAR files needed to run apidiff
+bin/            Miscellaneous utility script for use on Linux, macOS, Solaris
+                and for Cygwin on Microsoft Windows platforms
 
