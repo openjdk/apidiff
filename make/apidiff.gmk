@@ -1,0 +1,329 @@
+#
+# Copyright (c) 1999, 2018, Oracle and/or its affiliates. All rights reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+#
+# This code is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 2 only, as
+# published by the Free Software Foundation.  Oracle designates this
+# particular file as subject to the "Classpath" exception as provided
+# by Oracle in the LICENSE file that accompanied this code.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# version 2 for more details (a copy is included in the LICENSE file that
+# accompanied this code).
+#
+# You should have received a copy of the GNU General Public License version
+# 2 along with this work; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+# or visit www.oracle.com if you need additional information or have any
+# questions.
+#
+
+#----------------------------------------------------------------------
+#
+# compile jdk.codetools.apidiff
+
+JAVAFILES.jdk.codetools.apidiff := \
+	$(shell $(FIND) $(JAVADIR) -name \*.java -print )
+
+ifneq ($(DAISYDIFF_SRC),)
+	DAISYDIFF_SRC_JAVA = $(DAISYDIFF_SRC)/main/java
+	DAISYDIFF_SRC_RESOURCES = $(DAISYDIFF_SRC)/main/resources
+endif
+
+$(BUILDDIR)/classes.jdk.codetools.apidiff.ok: $(JAVAFILES.jdk.codetools.apidiff)
+	$(JAVAC) $(JAVAC_OPTIONS) \
+		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_JAR):$(DAISYDIFF_SRC_JAVA):$(EQUINOX_JAR):$(HTMLCLEANER_JAR) \
+		-d $(CLASSDIR) \
+		$(JAVAFILES.jdk.codetools.apidiff)
+	echo "classes built at `date`" > $@
+
+TARGETS.jdk.codetools.apidiff += $(BUILDDIR)/classes.jdk.codetools.apidiff.ok
+
+#----------------------------------------------------------------------
+#
+# resources required for jdk.codetools.apidiff
+
+RESOURCES.jdk.codetools.apidiff = \
+	$(CLASSDIR)/jdk/codetools/apidiff/resources/help.properties \
+	$(CLASSDIR)/jdk/codetools/apidiff/resources/log.properties \
+	$(CLASSDIR)/jdk/codetools/apidiff/report/html/resources/apidiff.css \
+	$(CLASSDIR)/jdk/codetools/apidiff/report/html/resources/report.properties
+
+TARGETS.jdk.codetools.apidiff += $(RESOURCES.jdk.codetools.apidiff)
+
+ifneq ($(DAISYDIFF_SRC),)
+DAISYDIFF_RESOURCE_FILES = $(shell $(FIND) $(DAISYDIFF_SRC_RESOURCES) -name \*.properties -print )
+RESOURCES.daisydiff = $(DAISYDIFF_RESOURCE_FILES:$(DAISYDIFF_SRC_RESOURCES)/%.properties=$(CLASSDIR)/%.properties)
+
+$(CLASSDIR)/%.properties: $(DAISYDIFF_SRC_RESOURCES)/%.properties
+	$(RM) -f $@
+	if [ ! -d $(@D) ] ; then $(MKDIR) -p $(@D) ; fi
+	$(CP) $(@:$(CLASSDIR)/%=$(DAISYDIFF_SRC_RESOURCES)/%) $@
+
+TARGETS.jdk.codetools.apidiff += $(RESOURCES.daisydiff)
+endif
+
+#----------------------------------------------------------------------
+#
+# Misc. doc files
+
+APIDIFF_COPYRIGHT 	= $(APIDIFF_IMAGEDIR)/COPYRIGHT
+APIDIFF_LICENSE		= $(APIDIFF_IMAGEDIR)/LICENSE
+APIDIFF_MAN_HTML 	= $(APIDIFF_IMAGEDIR)/doc/apidiff.html
+APIDIFF_MAN_NROFF 	= $(APIDIFF_IMAGEDIR)/man/man1/apidiff.1
+APIDIFF_README		= $(APIDIFF_IMAGEDIR)/README
+APIDIFF_USAGE 		= $(APIDIFF_IMAGEDIR)/doc/usage.txt
+
+APIDIFF_DOCS = \
+	$(APIDIFF_COPYRIGHT) \
+	$(APIDIFF_LICENSE) \
+	$(APIDIFF_MAN_HTML) \
+	$(APIDIFF_MAN_NROFF) \
+	$(APIDIFF_README) \
+	$(APIDIFF_USAGE)
+
+$(APIDIFF_COPYRIGHT): $(TOPDIR)/COPYRIGHT
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $< $@
+
+$(APIDIFF_README): $(SRCDOCDIR)/README
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $< $@
+
+$(APIDIFF_USAGE): $(BUILDDIR)/apidiff-usage.txt
+	$(MKDIR) -p $(@D)
+	$(CP) $^ $@
+
+$(APIDIFF_LICENSE): $(TOPDIR)/LICENSE
+	$(MKDIR) -p $(@D)
+	$(CP) $^ $@
+
+$(BUILDDIR)/apidiff-usage.txt: \
+		$(BUILDDIR)/classes.jdk.codetools.apidiff.ok \
+		$(CLASSDIR)/jdk/codetools/apidiff/resources/help.properties \
+		$(CLASSDIR)/jdk/codetools/apidiff/resources/log.properties
+	$(JAVA) -cp "$(CLASSDIR)" \
+	    -Dprogram=apidiff jdk.codetools.apidiff.Main --help > $@
+
+$(APIDIFF_MAN_HTML): $(SRCDOCDIR)/apidiff.md $(SRCDOCDIR)/apidiff.css
+	$(MKDIR) -p $(@D)
+	$(CP) $(SRCDOCDIR)/apidiff.css $(@D)
+	$(PANDOC) --standalone --to html5 --css apidiff.css $(SRCDOCDIR)/apidiff.md | \
+		$(SED) -e '/class="title"/s|>.*<|>apidiff<|' -e 's|<p class="date">.*</p>||' \
+			> $@
+
+$(APIDIFF_MAN_NROFF): $(SRCDOCDIR)/apidiff.md
+	$(MKDIR) -p $(@D)
+	$(PANDOC) --standalone --to man -o $@ $^
+
+TARGETS.ZIP.apidiff += $(APIDIFF_DOCS)
+
+#----------------------------------------------------------------------
+#
+# create apidiff.jar
+
+PKGS.JAR.apidiff += \
+	jdk.codetools.apidiff \
+	jdk.codetools.apidiff.resources \
+	jdk.codetools.apidiff.html \
+	jdk.codetools.apidiff.model \
+	jdk.codetools.apidiff.report \
+	jdk.codetools.apidiff.report.html \
+	jdk.codetools.apidiff.report.html.resources
+
+ifneq ($(DAISYDIFF_SRC),)
+	PKGS.JAR.apidiff += \
+		l10n \
+		org.eclipse.compare.internal \
+		org.eclipse.compare.rangedifferencer \
+		org.outerj.daisy.diff.html \
+		org.outerj.daisy.diff.html.modification \
+		org.outerj.daisy.diff.html.ancestor \
+		org.outerj.daisy.diff.html.ancestor.tagtostring \
+		org.outerj.daisy.diff.html.dom \
+		org.outerj.daisy.diff.html.dom.helper \
+		org.outerj.daisy.diff.output
+endif
+
+TARGETS.JAR.apidiff += $(TARGETS.jdk.codetools.apidiff)
+
+$(APIDIFF_IMAGEDIR)/lib/apidiff.jar: JAR_MAINCLASS = jdk.codetools.apidiff.Main
+$(APIDIFF_IMAGEDIR)/lib/apidiff.jar: JAR_EXTRAS = -C $(JAVADIR) META-INF/services/java.util.spi.ToolProvider
+
+$(APIDIFF_IMAGEJARDIR)/apidiff.jar: \
+	$(TARGETS.JAR.apidiff)
+
+TARGETS.ZIP.apidiff += $(APIDIFF_IMAGEJARDIR)/apidiff.jar
+
+debug:
+	echo TARGETS.ZIP.apidiff $(TARGETS.ZIP.apidiff)
+
+#----------------------------------------------------------------------
+#
+# executable scripts
+
+$(APIDIFF_IMAGEDIR)/bin/apidiff: $(SRCSHAREBINDIR)/apidiff.sh
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $<  $@
+	$(CHMOD) a+x,a-w $@
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/bin/apidiff
+
+#----------------------------------------------------------------------
+#
+# dependencies
+
+$(APIDIFF_IMAGEDIR)/lib/$(notdir $(JAVADIFFUTILS_JAR)): $(JAVADIFFUTILS_JAR)
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $(JAVADIFFUTILS_JAR) $@
+	$(CHMOD) a-w $@
+
+ifneq ($(JAVADIFFUTILS_LICENSE),)
+$(APIDIFF_IMAGEDIR)/legal/java-diff-utils/LICENSE: $(JAVADIFFUTILS_LICENSE)
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $(JAVADIFFUTILS_LICENSE) $@
+	$(CHMOD) a-w $@
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/legal/java-diff-utils/LICENSE
+endif
+
+JAR_CLASSPATH += $(notdir $(JAVADIFFUTILS_JAR))
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/lib/$(notdir $(JAVADIFFUTILS_JAR))
+
+$(APIDIFF_IMAGEDIR)/lib/$(notdir $(DAISYDIFF_JAR)): $(DAISYDIFF_JAR)
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $(DAISYDIFF_JAR) $@
+	$(CHMOD) a-w $@
+
+ifneq ($(DAISYDIFF_JAR),)
+JAR_CLASSPATH += $(notdir $(DAISYDIFF_JAR))
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/lib/$(notdir $(DAISYDIFF_JAR))
+endif
+
+ifneq ($(DAISYDIFF_SRC),)
+$(APIDIFF_IMAGEDIR)/lib/$(notdir $(EQUINOX_JAR)): $(EQUINOX_JAR)
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $(EQUINOX_JAR) $@
+	$(CHMOD) a-w $@
+
+JAR_CLASSPATH += $(notdir $(EQUINOX_JAR))
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/lib/$(notdir $(EQUINOX_JAR))
+endif
+
+ifneq ($(DAISYDIFF_LICENSE),)
+$(APIDIFF_IMAGEDIR)/legal/daisydiff/LICENSE: $(DAISYDIFF_LICENSE)
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $(DAISYDIFF_LICENSE) $@
+	$(CHMOD) a-w $@
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/legal/daisydiff/LICENSE
+endif
+
+$(APIDIFF_IMAGEDIR)/lib/$(notdir $(HTMLCLEANER_JAR)): $(HTMLCLEANER_JAR)
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $(HTMLCLEANER_JAR) $@
+	$(CHMOD) a-w $@
+
+JAR_CLASSPATH += $(notdir $(HTMLCLEANER_JAR))
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/lib/$(notdir $(HTMLCLEANER_JAR))
+
+ifneq ($(HTMLCLEANER_LICENSE),)
+$(APIDIFF_IMAGEDIR)/legal/htmlcleaner/LICENSE: $(HTMLCLEANER_LICENSE)
+	$(MKDIR) -p $(@D)
+	$(RM) $@
+	$(CP) $(HTMLCLEANER_LICENSE) $@
+	$(CHMOD) a-w $@
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/legal/htmlcleaner/LICENSE
+endif
+
+#----------------------------------------------------------------------
+#
+# release info
+
+# based on code in OpenJDK make/SourceRevision.gmk
+ID_COMMAND := $(PRINTF) "git:%s%s\n" \
+                 "$$(git log -n1 --format=%H | cut -c1-12)" \
+                 "$$(if test -n "$$(git status --porcelain)"; then printf '+'; fi)"
+
+$(APIDIFF_IMAGEDIR)/release:
+	echo "APIDIFF_VERSION=$(BUILD_VERSION) $(BUILD_NUMBER)" > $@
+	echo "BUILD_DATE=`/bin/date +'%B %d, %Y'`" >> $@
+	if [ -r $(TOPDIR)/.git ]; then \
+	    echo "SOURCE=$$($(ID_COMMAND))" >> $@ ; \
+	elif [ -r $(TOPDIR)/.src-rev ]; then \
+	    echo "SOURCE=\"$$($(CAT) $(TOPDIR)/.src-rev | $(SED) -e 's/:/:git:/' -e 's/  *$$//')\"" >> $@ ; \
+	fi
+
+TARGETS.ZIP.apidiff += \
+	$(APIDIFF_IMAGEDIR)/release
+
+#----------------------------------------------------------------------
+#
+#  create apidiff.zip bundles
+
+APIDIFF_ZIP = $(IMAGES_DIR)/apidiff.zip
+
+$(APIDIFF_ZIP): $(TARGETS.ZIP.apidiff)
+	$(RM) $@
+	cd $(IMAGES_DIR); $(ZIP) -rq $@ $(@F:%.zip=%)
+
+APIDIFF_ZIPFILES = $(APIDIFF_ZIP)
+
+#----------------------------------------------------------------------
+#
+#  create javadoc bundles
+
+$(BUILDDIR)/api.jdk.codetools.apidiff.ok: \
+		$(JAVAFILES.jdk.codetools.apidiff) \
+		$(SRCDOCDIR)/overview.html \
+		$(SRCDOCDIR)/jdk17.api/element-list
+	$(JAVADOC) $(JAVADOC_OPTIONS) \
+		-Xdoclint:-missing \
+		-quiet \
+		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_JAR) \
+		-overview $(SRCDOCDIR)/overview.html \
+		-linkoffline \
+		    https://docs.oracle.com/en/java/javase/11/docs/api/index.html \
+		    $(SRCDOCDIR)/jdk17.api \
+		-d $(BUILDDIR)/api \
+		$(JAVAFILES.jdk.codetools.apidiff)
+	echo "api built at `date`" > $@
+
+TARGETS.jdk.codetools.apidiff += $(BUILDDIR)/api.jdk.codetools.apidiff.ok
+
+#----------------------------------------------------------------------
+
+BUILDFILES += $(APIDIFF_ZIPFILES)
+
+VERBOSEZIPFILES += $(APIDIFF_ZIPFILES:%.zip=%-$(VERBOSE_ZIP_SUFFIX).zip)
+
+#APIDIFF_OPTS = 	$(APIDIFF_JAVA_OPTS:%=-J%)
+
+TESTS += $(TESTS.apidiff)

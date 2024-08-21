@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+ Copyright (c) 2007, 2023, Oracle and/or its affiliates. All rights reserved.
+ DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+
+ This code is free software; you can redistribute it and/or modify it
+ under the terms of the GNU General Public License version 2 only, as
+ published by the Free Software Foundation.  Oracle designates this
+ particular file as subject to the "Classpath" exception as provided
+ by Oracle in the LICENSE file that accompanied this code.
+
+ This code is distributed in the hope that it will be useful, but WITHOUT
+ ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ version 2 for more details (a copy is included in the LICENSE file that
+ accompanied this code).
+
+ You should have received a copy of the GNU General Public License version
+ 2 along with this work; if not, write to the Free Software Foundation,
+ Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+
+ Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ or visit www.oracle.com if you need additional information or have any
+ questions.
+-->
+
+<project name="apidiff" default="build" basedir="..">
+
+    <!-- ********** system-specific values ********************************* -->
+
+    <property file="build.properties"/>  <!-- for user overrides -->
+    <property file="make/build.properties"/>
+
+    <!-- ********** general useful values ********************************** -->
+
+    <property environment="env"/>
+
+    <property name="src.bin.dir" location="src/share/bin"/>
+    <property name="src.classes.dir" location="src/share/classes"/>
+    <property name="src.test.dir" location="test"/>
+    <property name="src.doc.dir" location="src/share/doc"/>
+    <property name="test.dir" location="test"/>
+    <property name="build.dir" location="build"/>
+    <property name="build.classes.dir" location="${build.dir}/classes" />
+    <property name="build.test.classes.dir" location="${build.dir}/test/classes" />
+    <property name="deps.dir" location="${build.dir}/deps" />
+    <property name="dist.dir" location="dist" />
+    <property name="dist.apidiff.dir" location="${dist.dir}/apidiff" />
+    <property name="dist.apidiff.zip" location="${dist.dir}/apidiff.zip" />
+
+    <!-- The following properties assume that the dependencies have been downloaded into build/deps. -->
+    <property name="daisydiff.jar" location="${deps.dir}/daisydiff/daisydiff-1.2/daisydiff.jar"/>
+    <property name="daisydiff.LICENSE" location="${deps.dir}/daisydiff/daisydiff-1.2/LICENSE.txt"/>
+    <property name="java-diff-utils.jar" location="${deps.dir}/java-diff-utils/java-diff-utils-4.12.jar"/>
+    <property name="java-diff-utils.LICENSE" location="${deps.dir}/java-diff-utils/LICENSE"/>
+    <property name="junit.jar" location="${deps.dir}/junit/junit-platform-console-standalone-1.9.2.jar "/>
+
+    <!-- ********** top level and shared targets *************************** -->
+
+    <target name="build" depends="dist-apidiff"
+        description="default build target: build apidiff for distribution"/>
+
+    <target name="clean" description="remove all generated files">
+        <delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
+    </target>
+
+    <!-- ********** init *************************************************** -->
+
+    <target name="-init">
+        <tstamp>
+            <format property="build.date" pattern="MM/dd/yyyy"/>
+            <format property="build.date.time" pattern="MM/dd/yyyy hh:mm aa"/>
+        </tstamp>
+    </target>
+
+    <!-- ********** apidiff ************************************************** -->
+
+    <patternset id="apidiff.packages">
+        <include name="jdk/codetools/apidiff/**"/>
+    </patternset>
+
+    <target name="dist-apidiff"
+        depends="jar-apidiff,-dist-apidiff.bin,-dist-apidiff.doc,-dist-apidiff.legal,-dist-apidiff.lib"
+        description="build apidiff for distribution">
+        <zip destfile="${dist.apidiff.zip}" filesOnly="true" basedir="${dist.dir}">
+            <include name="apidiff/"/>
+        </zip>
+    </target>
+
+    <target name="-dist-apidiff.bin" depends="jar-apidiff,-dist-apidiff.doc">
+        <copy file="${src.bin.dir}/apidiff.sh" tofile="${dist.apidiff.dir}/bin/apidiff"/>
+        <chmod dir="${dist.apidiff.dir}" perm="+x">
+            <include name="bin/apidiff"/>
+        </chmod>
+    </target>
+
+    <target name="-dist-apidiff.doc" depends="-compile-apidiff.usage">
+        <mkdir dir="${dist.apidiff.dir}/doc/apidiff"/>
+        <copy todir="${dist.apidiff.dir}" file="${src.doc.dir}/README"/>
+        <copy todir="${dist.apidiff.dir}/doc/apidiff">
+            <fileset file="${build.dir}/apidiff/usage.txt"/>
+        </copy>
+    </target>
+
+    <target name="-dist-apidiff.legal">
+        <copy todir="${dist.apidiff.dir}" file="COPYRIGHT"/>
+        <copy todir="${dist.apidiff.dir}" file="LICENSE"/>
+        <copy todir="${dist.apidiff.dir}/legal/java-diff-utils" file="${java-diff-utils.LICENSE}"/>
+        <copy todir="${dist.apidiff.dir}/legal/daisydiff" file="${daisydiff.LICENSE}"/>
+    </target>
+
+    <target name="-dist-apidiff.lib">
+        <copy todir="${dist.apidiff.dir}/lib" file="${java-diff-utils.jar}"/>
+        <copy todir="${dist.apidiff.dir}/lib" file="${daisydiff.jar}"/>
+    </target>
+
+    <target name="jar-apidiff" depends="-init,-check-apidiff.jar" unless="apidiff.jar.ok">
+        <mkdir dir="${dist.apidiff.dir}/lib"/>
+        <jar destfile="${dist.apidiff.dir}/lib/apidiff.jar"
+            basedir="${build.classes.dir}" >
+            <manifest>
+                <attribute name="Built-By" value="${user.name}"/>
+                <attribute name="Class-Path" value="java-diff-utils-4.0.jar daisydiff.jar"/>
+                <attribute name="Main-Class" value="jdk.codetools.apidiff.Main"/>
+                <attribute name="apidiff-Name" value="apidiff"/>
+                <attribute name="apidiff-Version" value="${build.version}"/>
+                <attribute name="apidiff-Milestone" value="${build.milestone}"/>
+                <attribute name="apidiff-Build" value="${build.number}"/>
+                <attribute name="apidiff-BuildJavaVersion" value="${java.version}"/>
+                <attribute name="apidiff-BuildDate" value="${build.date.time}"/>
+            </manifest>
+            <include name="COPYRIGHT"/>
+            <include name="buildInfo.txt"/>
+            <patternset refid="apidiff.packages"/>
+        </jar>
+    </target>
+
+    <target name="-check-apidiff.jar" depends="compile-apidiff">
+        <dependset>
+            <srcfileset dir="${build.classes.dir}">
+                <patternset refid="apidiff.packages"/>
+            </srcfileset>
+            <targetfilelist dir="${dist.apidiff.dir}/lib" files="apidiff.jar"/>
+        </dependset>
+        <available property="apidiff.jar.ok" file="${dist.apidiff.dir}/lib/apidiff.jar"/>
+    </target>
+
+    <target name="compile-apidiff" depends="-compile-apidiff.classes,-compile-apidiff.resources"/>
+
+    <target name="-compile-apidiff.classes">
+        <mkdir dir="${build.classes.dir}"/>
+        <javac encoding="utf-8" source="17" target="17"
+            debug="true" debuglevel="source,lines"
+            srcdir="${src.classes.dir}"
+            destdir="${build.classes.dir}"
+            classpath="${build.classes.dir};${java-diff-utils.jar};${daisydiff.jar}"
+            includeantruntime="false">
+            <compilerarg value="-Xlint:all"/>
+            <patternset refid="apidiff.packages"/>
+        </javac>
+    </target>
+
+    <target name="test" depends="compile-apidiff.tests">
+        <junitlauncher haltonfailure="true">
+            <classpath path="${build.test.classes.dir};${build.classes.dir};${java-diff-utils.jar};${daisydiff.jar};${junit.jar}" />
+            <testclasses outputDir="${build.dir}/test/report">
+                <fileset dir="${build.test.classes.dir}"/>
+                <fork>
+                    <jvmarg line="--add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED"/>
+                    <jvmarg line="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED"/>
+                    <jvmarg line="--add-exports jdk.jdeps/com.sun.tools.classfile=ALL-UNNAMED"/>
+                </fork>
+            </testclasses>
+        </junitlauncher>
+    </target>
+
+    <target name="compile-apidiff.tests" depends="compile-apidiff">
+        <mkdir dir="${build.test.classes.dir}"/>
+        <javac encoding="utf-8" source="17" target="17"
+            debug="true" debuglevel="source,lines"
+            srcdir="${src.test.dir}/junit"
+            destdir="${build.test.classes.dir}"
+            classpath="${build.classes.dir};${java-diff-utils.jar};${daisydiff.jar};${junit.jar}"
+            includeantruntime="false">
+            <compilerarg value="-Xlint:all"/>
+            <compilerarg line="--add-modules jdk.compiler,jdk.jdeps"/>
+            <compilerarg line="--add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED"/>
+            <compilerarg line="--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED"/>
+            <compilerarg line="--add-exports jdk.jdeps/com.sun.tools.classfile=ALL-UNNAMED"/>
+        </javac>
+    </target>
+
+    <target name="-compile-apidiff.resources">
+        <copy todir="${build.classes.dir}" file="COPYRIGHT"/>
+        <copy todir="${build.classes.dir}">
+            <fileset dir="${src.classes.dir}">
+                <patternset refid="apidiff.packages"/>
+                <include name="**/*.properties"/>
+                <include name="**/*.js"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+
+    <target name="-compile-apidiff.usage" depends="-compile-apidiff.classes">
+        <!-- generate the usage page from the command line help -->
+        <!-- have to set fork=true because otherwise output redirection gets screwed up -->
+        <mkdir dir="${build.dir}/apidiff"/>
+        <java fork="true" failonerror="true"
+            classname="jdk.codetools.apidiff.Main"
+            classpath="${build.classes.dir}"
+            output="${build.dir}/apidiff/usage.txt">
+            <jvmarg value="-Dprogram=apidiff"/>
+            <arg value="--help"/>
+        </java>
+    </target>
+
+</project>
