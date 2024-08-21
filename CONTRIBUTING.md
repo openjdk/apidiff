@@ -1,6 +1,6 @@
 # Contributing to APIDiff
 
-APIDiff is (or will be) part of the OpenJDK [CodeTools] Project.
+APIDiff is part of the OpenJDK [CodeTools] Project.
 
 Please see <https://openjdk.java.net/contribute/> for how to contribute.
 
