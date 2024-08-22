@@ -53,7 +53,6 @@ clean:
 sanity:
 	@echo "JDKHOME               = $(JDKHOME)"
 	@echo "JUNIT_JAR             = $(JUNIT_JAR)"
-	@echo "JCOMMANDER_JAR        = $(JCOMMANDER_JAR)"
 	@echo "JAVADIFFUTILS_JAR     = $(JAVADIFFUTILS_JAR)"
 	@echo "JAVADIFFUTILS_LICENSE = $(JAVADIFFUTILS_LICENSE)"
 	@echo "DAISYDIFF_JAR         = $(DAISYDIFF_JAR)"
