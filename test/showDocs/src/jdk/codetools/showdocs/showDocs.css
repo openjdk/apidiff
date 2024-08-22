@@ -1,0 +1,102 @@
+/*
+ * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+ *
+ * This code is free software; you can redistribute it and/or modify it
+ * under the terms of the GNU General Public License version 2 only, as
+ * published by the Free Software Foundation.
+ *
+ * This code is distributed in the hope that it will be useful, but WITHOUT
+ * ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+ * FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+ * version 2 for more details (a copy is included in the LICENSE file that
+ * accompanied this code).
+ *
+ * You should have received a copy of the GNU General Public License version
+ * 2 along with this work; if not, write to the Free Software Foundation,
+ * Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+ *
+ * Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+ * or visit www.oracle.com if you need additional information or have any
+ * questions.
+ */
+
+
+/* Global/default settings. */
+
+body {
+    font-family:'DejaVu Sans', Arial, Helvetica, sans-serif;
+    font-size:14px;
+}
+
+/* Headings. */
+
+h1 {
+    font-size:20px;
+}
+h2 {
+    font-size:18px;
+}
+h3 {
+    font-size:16px;
+    font-style:italic;
+}
+h4 {
+    font-size:13px;
+}
+h5 {
+    font-size:12px;
+}
+h6 {
+    font-size:11px;
+}
+
+/* Links. */
+
+a:link, a:visited {
+    text-decoration:none;
+    color:#4A6782;
+}
+a[href]:hover, a[href]:focus {
+    text-decoration:none;
+    color:#bb7a2a;
+}
+
+dl.all-serialized-forms > dt {
+    font-size: larger;
+    font-weight: bold;
+    margin-top: 1em;
+    border-top: 1px solid gray;
+    padding-top: 1em;
+}
+
+dl.api-descriptions > dt,
+dl.serialized-form-descriptions > dt {
+    font-weight: bold;
+}
+
+div.html {
+    border: 1px solid blue;
+    border-radius: 5px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 5px;
+}
+
+pre.text {
+    border: 1px solid magenta;
+    border-radius: 5px;
+    margin-top: 1em;
+    margin-bottom: 1em;
+    padding: 5px;
+    white-space: pre-wrap;
+}
+
+hr.serialized-form-rule {
+    margin-top: 2em;
+    color: gray;
+}
+
+dd > div > details {
+    margin-bottom: 2em;
+}

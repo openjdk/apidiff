@@ -1,0 +1,53 @@
+#
+# Copyright (c) 2020, 2021, Oracle and/or its affiliates. All rights reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+#
+# This code is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 2 only, as
+# published by the Free Software Foundation.  Oracle designates this
+# particular file as subject to the "Classpath" exception as provided
+# by Oracle in the LICENSE file that accompanied this code.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# version 2 for more details (a copy is included in the LICENSE file that
+# accompanied this code).
+#
+# You should have received a copy of the GNU General Public License version
+# 2 along with this work; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+# or visit www.oracle.com if you need additional information or have any
+# questions.
+#
+
+APIDIFF_VERSION=1
+
+DEFAULT_DAISYDIFF_BIN_VERSION=1.2
+DEFAULT_DAISYDIFF_BIN_ARCHIVE_CHECKSUM=fba904baf92f5208f36dc3ed3d6a19fbe9502b46
+DEFAULT_DAISYDIFF_LICENSE_VERSION=master
+DEFAULT_DAISYDIFF_LICENSE_CHECKSUM=7df059597099bb7dcf25d2a9aedfaf4465f72d8d
+
+DEFAULT_DAISYDIFF_SRC_VERSION=1.2-NX4
+DEFAULT_DAISYDIFF_SRC_ARCHIVE_CHECKSUM=742a36fe6471790f91190cdf33e4cb348b6754b2
+
+DEFAULT_EQUINOX_VERSION=3.6.0
+DEFAULT_EQUINOX_JAR_CHECKSUM=78e5d0b8516b042495660da36ce5114650f8f156
+DEFAULT_EQUINOX_LICENSE_CHECKSUM=8d80da0c92c1269b610b03cc8061556004898c85
+
+DEFAULT_HTMLCLEANER_VERSION=2.29
+DEFAULT_HTMLCLEANER_JAR_CHECKSUM=7b42d564b7d2a4674612ef0ec3696985cbd38343
+DEFAULT_HTMLCLEANER_LICENSE_CHECKSUM=800231adc60dec964ec28270f0f0b94398ce9b3f
+
+DEFAULT_JAVADIFFUTILS_VERSION=4.12
+DEFAULT_JAVADIFFUTILS_JAR_CHECKSUM=1a712a91324d566eef39817fc5c9980eb10c21db
+DEFAULT_JAVADIFFUTILS_LICENSE_VERSION=parent-4.12
+DEFAULT_JAVADIFFUTILS_LICENSE_CHECKSUM=7df059597099bb7dcf25d2a9aedfaf4465f72d8d
+
+# for testing
+# JUnit 5 = JUnit Platform 1.y.z + JUnit Jupiter 5.y.z + JUnit Vintage 5.y.z
+DEFAULT_JUNIT_VERSION=1.9.2
+DEFAULT_JUNIT_JAR_CHECKSUM=bb856bc86a6e6cd48080546afcaf7a210713ea21
+DEFAULT_JUNIT_LICENSE_FILE=LICENSE-junit.txt

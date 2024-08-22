@@ -1,0 +1,34 @@
+API Comparison Utility: apidiff
+
+
+Introduction
+
+...
+
+Release Notes.
+
+...
+
+
+System Requirements
+
+The following sections provide the recommended system requirements for running
+apidiff.
+
+- Java platform
+    A platform equivalent to JDK 17 or later is required.
+
+
+
+Files and Directories
+
+Name            Description
+README          This file
+COPYRIGHT       Copyright information
+LICENSE         License file
+doc/            Documentation files
+legal/          Copyright and license files
+lib/            Directory containing the JAR files needed to run apidiff
+bin/            Miscellaneous utility script for use on Linux, macOS, Solaris
+                and for Cygwin on Microsoft Windows platforms
+

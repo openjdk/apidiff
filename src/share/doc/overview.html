@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<title>APIDiff: Overview</title>
+<style>
+dd p:first-child {
+  margin-top: 0
+}
+</style>
+</head>
+<body>
+<h1>APIDiff: Overview</h1>
+
+<p>
+<code>APIDiff</code> is an API-comparison utility, comparing elements in
+different versions of an API, as represented by some combination of source files, class files,
+and generated documentation.
+
+<p>
+The tool operates by creating an instance of the Java compiler front-end
+(as found in the
+<a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.compiler/module-summary.html"><code>jdk.compiler</code></a> module)
+from which it can obtain the selected elements to be compared,
+using the
+<a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.compiler/javax/lang/model/package-summary.html">Java Language Model API</a>
+and
+<a href="https://docs.oracle.com/en/java/javase/17/docs/api/jdk.compiler/com/sun/source/doctree/package-summary.html">Compiler Tree API</a>.
+
+<dl>
+<dt>{@link jdk.codetools.apidiff.model Comparing declarations}
+<dd><p style="margin-top:0">
+Elements, type mirrors and names obtained from different instances of the
+compiler front-end cannot be compared referentially or by using {@link java.lang.Object#equals(Object) equals}.
+Instead, API-specific items can be represented in an API-independent manner
+using  <em>keys</em> for {@link jdk.codetools.apidiff.model.ElementKey elements} and
+{@link jdk.codetools.apidiff.model.TypeMirrorKey types};
+they can be identified within an API by means of {@link jdk.codetools.apidiff.model.Position positions};
+and corresponding items in different instances of an API can be associated together using
+{@link jdk.codetools.apidiff.model.APIMap API maps}, and which can be compared structurally,
+using a series of custom "comparator" classes.
+
+<p>
+When comparing the API descriptions for each selected element, the tool attempts to find
+the relevant content in the API documentation, provided by the
+<code>--api-directory</code> option.
+The content is extracted from the generated pages using one of two classes:
+{@link jdk.codetools.apidiff.model.APIReader APIReader} and
+{@link jdk.codetools.apidiff.model.SerializedFormReader SerializedFormReader},
+for reading general declaration pages and the "Serialized Form" pages respectively.
+
+<dt>{@link jdk.codetools.apidiff.report Reporting differences}
+<dd><p style="margin-top:0">
+Differences between corresponding elements in different versions of the API
+are reported using the {@link jdk.codetools.apidiff.report.Reporter Reporter}
+interface. This interface is the primary means of communication between the
+front-end, comparing declarations, and the back-end, generating reports.
+
+<dt>{@link jdk.codetools.apidiff.report Generating reports}
+<dd><p style="margin-top:0">
+The primary reporter is {@link jdk.codetools.apidiff.report.html.HtmlReporter HtmlReporter}.
+This reporter dispatches the reports of any differences to handlers that collect
+the information for the individual pages that will be generated once all the
+information for each page has been collected.
+
+</dl>
+
+</body>
+</html>

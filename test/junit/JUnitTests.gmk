@@ -1,0 +1,68 @@
+#
+# Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+# DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
+#
+# This code is free software; you can redistribute it and/or modify it
+# under the terms of the GNU General Public License version 2 only, as
+# published by the Free Software Foundation.
+#
+# This code is distributed in the hope that it will be useful, but WITHOUT
+# ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+# FITNESS FOR A PARTICULAR PURPOSE.  See the GNU General Public License
+# version 2 for more details (a copy is included in the LICENSE file that
+# accompanied this code).
+#
+# You should have received a copy of the GNU General Public License version
+# 2 along with this work; if not, write to the Free Software Foundation,
+# Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301 USA.
+#
+# Please contact Oracle, 500 Oracle Parkway, Redwood Shores, CA 94065 USA
+# or visit www.oracle.com if you need additional information or have any
+# questions.
+#
+
+JUnitTests.files := $(shell find $(TESTDIR)/junit -type f -name \*.java)
+
+JUnitTest.add-exports =  \
+		--add-modules jdk.jdeps \
+		--add-exports jdk.compiler/com.sun.tools.javac.api=ALL-UNNAMED \
+		--add-exports jdk.compiler/com.sun.tools.javac.main=ALL-UNNAMED \
+		--add-exports jdk.jdeps/com.sun.tools.classfile=ALL-UNNAMED
+
+JUnitTest.classpath = \
+		$(BUILDTESTDIR)/JUnitTests/classes:$(APIDIFF_IMAGEDIR)/lib/apidiff.jar:$(JAVADIFFUTILS_JAR):$(DAISYDIFF_JAR):$(HTMLCLEANER_JAR)
+
+$(BUILDTESTDIR)/JUnitTests.ok: \
+		$(BUILDTESTDIR)/JUnitTests.classes.ok
+	$(RM) $(@:%.ok=%/work) $(@:%.ok=%/report)
+	$(MKDIR) -p $(@:%.ok=%/work) $(@:%.ok=%/report)
+	cd $(@:%.ok=%/work) ; \
+	set -o pipefail ; \
+	$(JAVA) \
+		$(JUnitTest.add-exports) \
+		-jar $(JUNIT_JAR) \
+		-classpath $(JUnitTest.classpath) \
+			--reports-dir=$(@:%.ok=%/report) \
+			--select-package=apitest \
+			2>&1 | tee $(@:%.ok=%/log)
+	echo $@ passed at `date` > $@
+
+$(BUILDTESTDIR)/JUnitTests.classes.ok: \
+		$(JUnitTests.files) \
+		$(APIDIFF_IMAGEDIR)/lib/apidiff.jar \
+		$(JUNIT_JAR)
+	$(JAVAC) \
+		-d $(BUILDTESTDIR)/JUnitTests/classes \
+		--class-path $(JUNIT_JAR):$(JUnitTest.classpath) \
+		$(JUnitTest.add-exports) \
+		$(JUnitTests.files)
+	echo $@ compiled at `date` > $@
+
+# ignore exit code from $(TIDY) until we resolve the duplicate-id problem
+$(BUILDTESTDIR)/JUnitTests.tidy.ok:
+	-$(TIDY) -q -e --gnu-emacs true `$(FIND) $(@:%.tidy.ok=%/work) -name \*.html`
+	echo files checked by tidy at `date` > $@
+
+TESTS += \
+	$(BUILDTESTDIR)/JUnitTests.ok \
+	$(BUILDTESTDIR)/JUnitTests.tidy.ok
