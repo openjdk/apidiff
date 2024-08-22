@@ -10,7 +10,7 @@ _apidiff_ has various external dependencies:
 * _JDK_: must be at least JDK 17
 * _Java Diff Utils_
 * _Daisy Diff_
-* _TestNG_ and _JCommander_ (for testing only)
+* _JUnit_ (for testing only)
 
 ## Using `make/build.sh`
 
@@ -34,7 +34,7 @@ The script supports the following build scenarios:
 
 * Use local copies of the dependencies on the same machine.
   The details can be specified in an alternate `version-numbers` file,
-  or you can bypas the script entirely and invoke `make` directly.
+  or you can bypass the script entirely and invoke `make` directly.
 
 For more details, see the comments in `make/build.sh` and use the `--help`
 option when running the script.
@@ -48,7 +48,7 @@ The makefile provides the following targets:
 
 * `test`: run tests
 
-    Requires `TESTNG_JAR` and `JCOMMANDER_JAR` to be set.
+    Requires `JUNIT_JAR` to be set.
 
 * `clean`: delete the `build` directory and its contents
 
