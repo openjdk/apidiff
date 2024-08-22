@@ -70,7 +70,7 @@ public class NotesTest extends APITester {
         String text ="""
                 # this is a comment
 
-                http://openjdk.java.net/jeps/0 JEP 0
+                http://openjdk.org/jeps/0 JEP 0
                   mA
                   mA/*
                   mA/p
@@ -110,37 +110,37 @@ public class NotesTest extends APITester {
         Elements elements = t.getElements();
         ModuleElement mA = elements.getModuleElement("mA");
         checkEntries(mA,
-                "Entry[name=mA,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=false]",
-                "Entry[name=mA,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]");
+                "Entry[name=mA,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=false]",
+                "Entry[name=mA,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]");
 
         PackageElement p = elements.getPackageElement(mA, "p");
         checkEntries(p,
-                "Entry[name=mA,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]",
-                "Entry[name=mA/p,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=false]",
-                "Entry[name=mA/p,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]");
+                "Entry[name=mA,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]",
+                "Entry[name=mA/p,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=false]",
+                "Entry[name=mA/p,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]");
 
         TypeElement pC = elements.getTypeElement(mA, "p.C");
         checkEntries(pC,
-                "Entry[name=mA,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]",
-                "Entry[name=mA/p,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]",
-                "Entry[name=mA/p.C,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]",
-                "Entry[name=mA/p.C,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=false]");
+                "Entry[name=mA,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]",
+                "Entry[name=mA/p,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]",
+                "Entry[name=mA/p.C,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]",
+                "Entry[name=mA/p.C,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=false]");
 
         TypeElement pCN = elements.getTypeElement(mA, "p.C.Nested");
         checkEntries(pCN,
-                "Entry[name=mA,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]",
-                "Entry[name=mA/p,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]",
-                "Entry[name=mA/p.C,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=true]");
+                "Entry[name=mA,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]",
+                "Entry[name=mA/p,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]",
+                "Entry[name=mA/p.C,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=true]");
 
         VariableElement f1 = getField(pC, "f1");
         checkEntries(f1,
-                "Entry[name=mA/p.C#f1,uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=false]");
+                "Entry[name=mA/p.C#f1,uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=false]");
         VariableElement f2 = getField(pC, "f2");
         checkEntries(f2);
 
         ExecutableElement m1_int = getMethod(pC, "m1", "int");
         checkEntries(m1_int,
-                "Entry[name=mA/p.C#m1(int),uri=http://openjdk.java.net/jeps/0,description=JEP 0,recursive=false]");
+                "Entry[name=mA/p.C#m1(int),uri=http://openjdk.org/jeps/0,description=JEP 0,recursive=false]");
 
         ExecutableElement m1_String = getMethod(pC, "m1", "java.lang.String");
         checkEntries(m1_String);
