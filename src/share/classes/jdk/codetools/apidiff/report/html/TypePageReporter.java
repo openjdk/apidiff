@@ -577,7 +577,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
                     contents.add(Text.of(pageKey.name.toString()));
 
                 case METHOD -> {
-                    contents.add(buildType(ePos,
+                    contents.add(buildType(ePos.returnType(),
                             ((ExecutableElement) e)::getReturnType));
                     contents.add(Text.SPACE);
                     contents.add(Text.of(e.getSimpleName()));
