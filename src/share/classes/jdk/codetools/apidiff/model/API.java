@@ -358,6 +358,11 @@ public abstract class API {
                 this.locn = locn;
                 this.kinds = kinds;
             }
+
+            @Override
+            public String toString() {
+                return getClass().getSimpleName() + "[locn:" + locn + ",kinds:" + kinds + "]";
+            }
         }
 
         private Map<String, LocationAndKinds> moduleLocationAndKinds;
