@@ -178,6 +178,14 @@ public class Selector {
             return excludesPackage(moduleName, packageName)
                     || includesPackage(moduleName, packageName) && excludeType.test(typeName);
         }
+
+        @Override
+        public String toString() {
+            return getClass().getSimpleName() + "[modulePart:" + modulePart
+                    + ",packagePart:" + packagePart
+                    + ",typePart:" + typePart
+                    + "]";
+        }
     }
 
     final List<Entry> includes;
