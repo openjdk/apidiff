@@ -9,7 +9,7 @@ defined by a series of options similar to those supported by `javac`.
 
 * _[Daisy Diff]_: an HTML comparison library, required when building `apidiff`
 * _[Java Diff Utils]_: a plain-text comparison library, required when building `apidiff`
-* _[TestNG]_: the testing framework, used to run some of the tests for `apidiff`
+* _[JUnit]_: the testing framework, used to run some of the tests for `apidiff`
 
 Suitable versions of these dependencies can be downloaded by running
 `make/build.sh`.
@@ -39,12 +39,12 @@ unless these values have been overridden on the command line used to run `make`.
 An IDE such as IntelliJ IDEA needs the following configuration:
 
 * Sources Root: `src`
-* TestNG Test Root: `test/testng`
+* JUnit Test Root: `test/junit`
 * Libraries:
-  * _Daisy Diff_, _Java Diff Utils_ available for compilation
-  * _TestNG_ available for testing
+  * _Daisy Diff_, _HTMLCleaner_, _Java Diff Utils_ available for compilation
+  * _JUnit_ available for testing
 
-In addition, some TestNG tests require access to internal classes in
+In addition, some JUnit tests require access to internal classes in
 the `jdk.compiler` and `jdk.jdeps` modules:
 
 ````
@@ -80,4 +80,4 @@ parts of those files that will be compared by `apidiff`.
 
 [Daisy Diff]: https://github.com/DaisyDiff/DaisyDiff
 [Java Diff Utils]: https://github.com/java-diff-utils/java-diff-utils
-[TestNG]: https://testng.org/
+[JUnit]: https://junit.org/
