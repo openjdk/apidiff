@@ -9,6 +9,7 @@ _apidiff_ has various external dependencies:
 
 * _JDK_: must be at least JDK 17
 * _Java Diff Utils_
+* _HtmlCleaner_
 * _Daisy Diff_
 * _JUnit_ (for testing only)
 
@@ -44,7 +45,9 @@ The makefile provides the following targets:
 * `build`: build _apidiff_
 
    Requires the following to be set:
-   `JDKHOME`, `JAVA_DIFF_UTILS_JAR`, `JAVA_DIFF_UTILS_LICENSE`, `DAISYDIFF_JAR`, `DAISYDIFF_LICENSE`.
+   `JDKHOME`, `JAVA_DIFF_UTILS_JAR`, `JAVA_DIFF_UTILS_LICENSE`,
+   `DAISYDIFF_JAR`, `DAISYDIFF_LICENSE`,
+   `HTMLCLEANER_JAR`, `HTMLCLEANER_LICENSE`.
 
 * `test`: run tests
 
@@ -66,12 +69,12 @@ The makefile provides the following targets:
 
 ## File Locations
 
-| Files                | GNU Make                          | Ant                                     | IntelliJ          |
-|----------------------|-----------------------------------|-----------------------------------------|-------------------|
-| Default Dependencies | build/deps                        | build/deps                              | build/deps        |
-| Main Classes         | build/classes                     | build/classes                           | out/production    |
-| Test Classes         | build/TestNGTests/classes         | build/test/classes                      | out/test          |
-| Test Work            | build/TestNGTests/work            | build/test/work                         | build/test/work   |
-| Test Report          | build/TestNGTests/report          | build/test/report                       |                   |
-| Image                | build/images/apidiff              | dist/apidiff                            |                   |
-| Bundle               | build/images/apidiff.zip          | dist/apidiff.zip                        |                   |
+| Files                | GNU Make                 | Ant                | IntelliJ          |
+|----------------------|--------------------------|--------------------|-------------------|
+| Default Dependencies | build/deps               | build/deps         | build/deps        |
+| Main Classes         | build/classes            | build/classes      | out/production    |
+| Test Classes         | build/JUnitTests/classes | build/test/classes | out/test          |
+| Test Work            | build/JUnitTests/work    | build/test/work    | build/test/work   |
+| Test Report          | build/JUnitTests/report  | build/test/report  |                   |
+| Image                | build/images/apidiff     | dist/apidiff       |                   |
+| Bundle               | build/images/apidiff.zip | dist/apidiff.zip   |                   |
