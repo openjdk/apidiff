@@ -33,11 +33,14 @@ JAVAFILES.jdk.codetools.apidiff := \
 ifneq ($(DAISYDIFF_SRC),)
 	DAISYDIFF_SRC_JAVA = $(DAISYDIFF_SRC)/main/java
 	DAISYDIFF_SRC_RESOURCES = $(DAISYDIFF_SRC)/main/resources
+	DAISYDIFF_CLASSPATH_ELEMENT = $(DAISYDIFF_SRC_JAVA)
+else
+	DAISYDIFF_CLASSPATH_ELEMENT = $(DAISYDIFF_JAR)
 endif
 
 $(BUILDDIR)/classes.jdk.codetools.apidiff.ok: $(JAVAFILES.jdk.codetools.apidiff)
 	$(JAVAC) $(JAVAC_OPTIONS) \
-		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_JAR):$(DAISYDIFF_SRC_JAVA):$(EQUINOX_JAR):$(HTMLCLEANER_JAR) \
+		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_CLASSPATH_ELEMENT):$(EQUINOX_JAR):$(HTMLCLEANER_JAR) \
 		-d $(CLASSDIR) \
 		$(JAVAFILES.jdk.codetools.apidiff)
 	echo "classes built at `date`" > $@
