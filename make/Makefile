@@ -41,6 +41,8 @@ build: check-build-vars $(BUILDFILES)
 
 images: $(VERBOSEZIPFILES)
 
+docs: $(BUILDDIR)/api.jdk.codetools.apidiff.ok
+
 test: check-test-vars $(INITIAL_TESTS) $(TESTS) $(FINAL_TESTS)
 	count=`echo $+ | wc -w` ; \
 	echo "All ($${count}) selected tests completed successfully"
