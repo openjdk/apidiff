@@ -223,8 +223,10 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
         Set<Content> keywords = tMap.values().stream()
                 .map(e -> {
                     return switch (e.getKind()) {
-                        case CLASS, ENUM -> Keywords.IMPLEMENTS;
+                        case CLASS, ENUM, RECORD -> Keywords.IMPLEMENTS;
                         case ANNOTATION_TYPE, INTERFACE -> Keywords.EXTENDS;
+                        // for newer kinds, not supported by the default version of JDK
+                        // used to compile apidiff, use a reflective comparison
                         default -> throw new IllegalStateException((e.getKind().toString()));
                     };
                 })
