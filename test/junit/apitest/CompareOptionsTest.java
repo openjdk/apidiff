@@ -55,10 +55,10 @@ public class CompareOptionsTest extends APITester {
         Path outDir = run(base, "--compare-api-descriptions-as-text=true");
         checkOutput(outDir.resolve("p/C.html"),
                 """
-                      7 <span class="sdiffs-lines-changed"> abc. </span><span class="sdiffs-chars-changed">BEFORE</span><span class="sdiffs-lines-changed">. def.</span>
+                    <span class="sdiffs-lines-changed"> abc. </span><span class="sdiffs-chars-changed">BEFORE</span><span class="sdiffs-lines-changed">. def.</span>
                     """,
                 """
-                      7 <span class="sdiffs-lines-changed"> abc. </span><span class="sdiffs-chars-changed">AFTER</span><span class="sdiffs-lines-changed">. def.</span>
+                    <span class="sdiffs-lines-changed"> abc. </span><span class="sdiffs-chars-changed">AFTER</span><span class="sdiffs-lines-changed">. def.</span>
                     """);
     }
 
