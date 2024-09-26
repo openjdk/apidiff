@@ -59,6 +59,7 @@ public class DocPath {
      * @param p the string
      */
     protected DocPath(String p) {
+        p = p.replace(File.separatorChar, '/'); // normalize paths
         path = (p.endsWith("/") ? p.substring(0, p.length() - 1) : p);
     }
 
