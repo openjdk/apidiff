@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -91,7 +91,7 @@ public class GetSerialVersionUIDTest extends APITester {
     @MethodSource("provideLocalClasses")
     public void testLocal(String interfaces, String members) throws Exception {
         log.printf("interfaces: %s; members: %s%n", interfaces, members);
-        Path base = getScratchDir().resolve(getDirectory(interfaces, members));
+        Path base = getScratchDir(getSubdirectoryName(interfaces, members));
         log.println(base);
 
         Path src = Files.createDirectories(base.resolve("src"));
@@ -154,16 +154,18 @@ public class GetSerialVersionUIDTest extends APITester {
         Assertions.assertEquals(platformSerialVersionUID, classSerialVersionUID, "serialVersionUID from class");
     }
 
-    Path getDirectory(String interfaces, String members) {
+    String getSubdirectoryName(String interfaces, String members) {
         String i = Stream.of(interfaces.split("\\s+"))
                 .map(s -> s.substring(s.lastIndexOf(".") + 1))
                 .collect(Collectors.joining("-"));
-        String m = Stream.of(members.split(";\\s*"))
-                .map(s -> s.replaceAll("=.*", ""))
-                .map(s -> s.substring(s.lastIndexOf(" ") + 1))
-                .collect(Collectors.joining("-"));
+        // allow for all kinds of members: not just fields
+        String m = members.replaceAll("[^A-Za-z0-9]+", "-");
+        int MAX_MEMBER_LENGTH = 32;
+        if (m.length() > MAX_MEMBER_LENGTH) {
+            m = m.substring(0, MAX_MEMBER_LENGTH);
+        }
         String sep = i.isEmpty() || m.isEmpty() ? "" : "-";
-        return Path.of(i + sep + m);
+        return i + sep + m;
     }
 
     long getPlatformSerialVersionUID(Path classes, String name) throws Exception {
