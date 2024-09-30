@@ -61,22 +61,44 @@ public class JDKBuildOption {
     }
 
     void expand(Options options, Options.APIOptions apiOptions, Log log) {
-        apiOptions.addFileManagerOpt("--system", getSystem().toString());
+
+        boolean verbose = options.isVerbose(Options.VerboseKind.OPTIONS);
+        if (verbose) {
+            log.err.println("Expanding --jdk-build for API " + apiOptions.name);
+            log.err.println("    --jdk-build: " + buildDir);
+        }
+
+        Path system = getSystem();
+        if (verbose) {
+            log.err.println("  --system " + system);
+        }
+        apiOptions.addFileManagerOpt("--system", system.toString());
 
         // proactively get api dir if available, in case we want to subsequently
         // set compareAPIDescriptions by default
-        apiOptions.apiDir = getAPIDirectory(options, log);
+        Path apiDir = getAPIDirectory(options, log);
+        if (verbose && apiDir != null) {
+            log.err.println("  --api-directory " + apiDir);
+        }
+        apiOptions.apiDir = apiDir;
 
         if (options.compareDocComments == Boolean.TRUE) {
             Set<String> modules = new LinkedHashSet<>();
             Path tmpDir = unpackSource(options, log, modules);
             for (String m : modules) {
-                apiOptions.addFileManagerOpt("--patch-module",
-                        m + "=" + tmpDir.resolve(m));
+                String patchModule = m + "=" + tmpDir.resolve(m);
+                if (verbose) {
+                    log.err.println("  --patch-module " + patchModule);
+                }
+                apiOptions.addFileManagerOpt("--patch-module", patchModule);
             }
             // since we're also setting the --system option,
             // just set the --source option here
-            apiOptions.source = getRelease(log);
+            String release = getRelease(log);
+            if (verbose) {
+                log.err.println("  --source " + release);
+            }
+            apiOptions.source = release;
         }
     }
 

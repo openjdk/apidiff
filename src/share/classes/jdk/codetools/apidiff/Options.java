@@ -40,6 +40,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -117,6 +118,33 @@ public class Options {
 
         void addFileManagerOpt(String opt, String arg) {
             fileManagerOpts.computeIfAbsent(opt, _o -> new ArrayList<>()).add(arg);
+        }
+
+        public void showVerboseSummary(Log log) {
+            log.err.println("Summary of options for API " + name);
+            if (label != null && !label.equals(name)) {
+                log.err.println("  label: " + label);
+            }
+            if (jdkBuildDir != null) {
+                log.err.println("  [--jdk-build " + jdkBuildDir + "]");
+            }
+            if (!fileManagerOpts.isEmpty()) {
+                fileManagerOpts.forEach((opt, list) -> {
+                    log.err.println("  " + opt + " " + list.stream().collect(Collectors.joining(" ")));
+                });
+            }
+            if (release != null) {
+                log.err.println("  --release " + release);
+            }
+            if (source != null) {
+                log.err.println("  --source " + source);
+            }
+            if (enablePreview) {
+                log.err.println("  --enable-preview");
+            }
+            if (apiDir != null) {
+                log.err.println("  --api-directory " + apiDir);
+            }
         }
 
         public String toString() {
@@ -202,7 +230,9 @@ public class Options {
         /** Generate messages about missing items. */
         MISSING,
         /** Generate messages about the time taken. */
-        TIME
+        TIME,
+        /** Generate messages about handling the command-line options. */
+        OPTIONS
     }
 
     private Set<VerboseKind> verboseKinds = EnumSet.noneOf(VerboseKind.class);

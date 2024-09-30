@@ -106,11 +106,12 @@ public abstract class API {
      * @param ak    the access kind, to filter the set of elements to be compared according
      *              their declared access
      * @param log   a log, to which any problems will be reported
+     * @param verboseOptions whether to be verbose about internal opton details
      *
      * @return the API
      */
-    public static API of(APIOptions opts, Selector s, AccessKind ak, Log log) {
-        return new JavacAPI(opts, s, ak, log);
+    public static API of(APIOptions opts, Selector s, AccessKind ak, Log log, boolean verboseOptions) {
+        return new JavacAPI(opts, s, ak, log, verboseOptions);
     }
 
     /**
@@ -145,19 +146,25 @@ public abstract class API {
     protected final StandardJavaFileManager fileManager;
 
     /**
+     * Whether to be verbose about internal option details.
+     */
+    protected final boolean verboseOptions;
+
+    /**
      * Creates an instance of an API.
      *
      * @param opts  the options for the API
      * @param s     the selector for the elements to be compared
      * @param ak    the access kind for the elements to be compared
-     * @param log   the log, to which any any problems will be reported
+     * @param log   the log, to which any problems will be reported
      */
-    protected API(APIOptions opts, Selector s, AccessKind ak, Log log) {
+    protected API(APIOptions opts, Selector s, AccessKind ak, Log log, boolean verboseOptions) {
         this.name = opts.name;
         this.label = opts.label;
         this.selector = s;
         this.accessKind = ak;
         this.log = log;
+        this.verboseOptions = verboseOptions;
 
         fileManager = compiler.getStandardFileManager(null, null, null);
     }
@@ -338,6 +345,7 @@ public abstract class API {
 
     static class JavacAPI extends API {
         private List<String> javacOpts;
+        private List<String> fmOpts; // just for verbose reporting
         private int platformVersion;
         private Elements elements;
         private Types types;
@@ -380,13 +388,16 @@ public abstract class API {
             }
         };
 
-        JavacAPI(APIOptions opts, Selector s, AccessKind ak, Log log) {
-            super(opts, s, ak, log);
+        JavacAPI(APIOptions opts, Selector s, AccessKind ak, Log log, boolean verboseOptions) {
+            super(opts, s, ak, log, verboseOptions);
 
+            fmOpts = new ArrayList<>();
             for (Map.Entry<String, List<String>> e : opts.fileManagerOpts.entrySet()) {
                 String opt = e.getKey();
+                fmOpts.add(opt);
                 List<String> args = e.getValue();
                 for (String arg : args) {
+                    fmOpts.add(arg);
                     Iterator<String> argIter = arg == null
                             ? Collections.emptyIterator()
                             : Collections.singleton(arg).iterator();
@@ -440,6 +451,9 @@ public abstract class API {
                 javacOpts.add(String.join(",", selectedModules));
             }
             javacOpts.add("-proc:only");
+            if (verboseOptions) {
+                showJavacOptions();
+            }
             JavacTask javacTask = (JavacTask) compiler.getTask(log.err, fileManager, this::reportDiagnostic, javacOpts, null, null);
             elements = javacTask.getElements();
             elements.getModuleElement("java.base"); // forces module graph to be instantiated, etc
@@ -462,6 +476,32 @@ public abstract class API {
                     return serializedFormDocsMap.get(name);
                 }
             };
+        }
+
+        private void showJavacOptions() {
+            log.err.println("Effective javac options for API " + name);
+            boolean needNewline = false;
+            // The following is a convenient fiction: to report all the javac options as "equivalent".
+            // In reality, the file manager options have already been handled separately and are
+            // now stashed in the file manager, without easy access (except via Locations).
+            List<String> allOpts = new ArrayList<>();
+            allOpts.addAll(fmOpts);
+            allOpts.addAll(javacOpts);
+            for (String opt : allOpts) {
+                if (opt.startsWith("-")) {
+                    if (needNewline) {
+                        log.err.println();
+                    }
+                    log.err.print("  ");
+                } else {
+                    log.err.print(" ");
+                }
+                log.err.print(opt);
+                needNewline = true;
+            }
+            if (needNewline) {
+                log.err.println();
+            }
         }
 
         @Override

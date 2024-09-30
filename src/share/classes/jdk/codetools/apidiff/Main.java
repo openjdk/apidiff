@@ -170,8 +170,13 @@ public class Main {
         Selector s = new Selector(options.includes, options.excludes);
         AccessKind ak = options.getAccessKind();
 
+        boolean verboseOptions = options.isVerbose(VerboseKind.OPTIONS);
+        if (verboseOptions) {
+            options.allAPIOptions.values().stream().forEach(a -> a.showVerboseSummary(log));
+        }
+
         Set<API> apis = options.allAPIOptions.values().stream()
-                .map(a -> API.of(a, s, ak, log))
+                .map(a -> API.of(a, s, ak, log, verboseOptions))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         List<Reporter> rList = new ArrayList<>();
