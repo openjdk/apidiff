@@ -179,7 +179,7 @@ div.signature {
 
 .doc-files span.diff,   .element span.diff,   .enclosed span.diff,   .serial-form span.diff,
 .doc-files span.same,   .element span.same,   .enclosed span.same,   .serial-form span.same,
-.doc-files span.single, .element span.single, .enclosed span.single, .serial-form span.single {
+.doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial {
     display: inline-block;
     width: 2em;
     margin-right: 0.5ex;
@@ -197,7 +197,7 @@ div.signature {
     color: #080;
 }
 
-.doc-files span.single, .element span.single, .enclosed span.single, .serial-form span.single {
+.doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial {
     background: #ddf;
     color: #008;
 }

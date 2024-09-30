@@ -170,6 +170,8 @@ public class Main {
         Selector s = new Selector(options.includes, options.excludes);
         AccessKind ak = options.getAccessKind();
 
+        // TODO: when APIDiff moves to JDK 21, thia can trivially become SequencedSet,
+        //       which would be useful in varoius places, such as PageReporter.getResultGlyph
         Set<API> apis = options.allAPIOptions.values().stream()
                 .map(a -> API.of(a, s, ak, log))
                 .collect(Collectors.toCollection(LinkedHashSet::new));

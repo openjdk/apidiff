@@ -45,10 +45,14 @@ public class Entity extends Content {
     public static final Entity CROSS = new Entity("cross", 0x2717);
     /** Unicode EQUALS SIGN. */
     public static final Entity EQUALS = new Entity("equals", 0x3d);
-    /** Unicode NOT EQUAL TO. */
-    public static final Entity NE = new Entity("ne", 0x2260);
+    /** Unicode MINUS. */
+    public static final Entity MINUS = new Entity("minus", 0x2212);
     /** Unicode NO-BREAK SPACE. */
     public static final Entity NBSP = new Entity("nbsp", 0xa0);
+    /** Unicode NOT EQUAL TO. */
+    public static final Entity NE = new Entity("ne", 0x2260);
+    /** Unicode PLUS. */
+    public static final Entity PLUS = new Entity("plus", 0x2b);
 
     private static final boolean useNumericEntities = Boolean.getBoolean("useNumericEntities");
 
