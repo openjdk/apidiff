@@ -49,7 +49,7 @@ import jdk.codetools.apidiff.model.SerializedForm;
  */
 public class TestAPI extends API {
     TestAPI(String name) {
-        super(new Options.APIOptions(name), null, null, null);
+        super(new Options.APIOptions(name), null, null, null, false);
     }
 
     @Override

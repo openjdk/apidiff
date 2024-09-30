@@ -172,7 +172,7 @@ public class Main {
 
         boolean verboseOptions = options.isVerbose(VerboseKind.OPTIONS);
         if (verboseOptions) {
-            options.allAPIOptions.values().stream().forEach(a -> a.showVerboseSummary(log));
+            options.allAPIOptions.values().forEach(a -> a.showVerboseSummary(log));
         }
 
         Set<API> apis = options.allAPIOptions.values().stream()

@@ -359,7 +359,7 @@ public abstract class API {
         /**
          * A tuple containing a location and the kinds of files that may be read from that location.
          */
-        private class LocationAndKinds {
+        private static class LocationAndKinds {
             final Location locn;
             final Set<JavaFileObject.Kind> kinds;
             LocationAndKinds(Location locn, Set<JavaFileObject.Kind> kinds) {
@@ -605,7 +605,7 @@ public abstract class API {
                     .filter(d -> d.getKind() == ModuleElement.DirectiveKind.EXPORTS)
                     .map(d -> (ModuleElement.ExportsDirective) d)
                     .filter(d -> d.getTargetModules() == null)
-                    .map(d -> d.getPackage())
+                    .map(ModuleElement.ExportsDirective::getPackage)
                     .collect(Collectors.toSet());
 
             return getPackageElements(m).stream()
@@ -1100,7 +1100,7 @@ public abstract class API {
 
             @Override
             public Void visitNull(NullType t, StringBuilder sb) {
-                throw new IllegalArgumentException(t.getKind() + " " + t.toString());
+                throw new IllegalArgumentException(t.getKind() + " " + t);
             }
 
             @Override

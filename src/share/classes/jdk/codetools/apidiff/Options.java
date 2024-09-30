@@ -40,7 +40,6 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -130,7 +129,7 @@ public class Options {
             }
             if (!fileManagerOpts.isEmpty()) {
                 fileManagerOpts.forEach((opt, list) -> {
-                    log.err.println("  " + opt + " " + list.stream().collect(Collectors.joining(" ")));
+                    log.err.println("  " + opt + " " + String.join(" ", list));
                 });
             }
             if (release != null) {
@@ -240,7 +239,6 @@ public class Options {
     // meta options
     boolean help;
     boolean version;
-    private boolean verbose;
 
     // hidden options
     private Map<String, String> hidden = new HashMap<>();
@@ -467,7 +465,7 @@ public class Options {
          */
         JDK_DOCS("--jdk-docs", "opt.arg.jdk-docs") {
             @Override
-            void process(String opt, String arg, Options options) throws BadOption {
+            void process(String opt, String arg, Options options) {
                 options.jdkDocs = arg;
             }
         },
