@@ -2,7 +2,6 @@
 .DS_store
 .idea
 /.src-rev
-/build.properties
 attic
 build
 dist
