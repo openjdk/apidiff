@@ -69,12 +69,12 @@ The makefile provides the following targets:
 
 ## File Locations
 
-| Files                | GNU Make                 | Ant                | IntelliJ          |
-|----------------------|--------------------------|--------------------|-------------------|
-| Default Dependencies | build/deps               | build/deps         | build/deps        |
-| Main Classes         | build/classes            | build/classes      | out/production    |
-| Test Classes         | build/JUnitTests/classes | build/test/classes | out/test          |
-| Test Work            | build/JUnitTests/work    | build/test/work    | build/test/work   |
-| Test Report          | build/JUnitTests/report  | build/test/report  |                   |
-| Image                | build/images/apidiff     | dist/apidiff       |                   |
-| Bundle               | build/images/apidiff.zip | dist/apidiff.zip   |                   |
+| Files                | GNU Make                 | IntelliJ          |
+|----------------------|--------------------------|-------------------|
+| Default Dependencies | build/deps               | build/deps        |
+| Main Classes         | build/classes            | out/production    |
+| Test Classes         | build/JUnitTests/classes | out/test          |
+| Test Work            | build/JUnitTests/work    | build/test/work   |
+| Test Report          | build/JUnitTests/report  |                   |
+| Image                | build/images/apidiff     |                   |
+| Bundle               | build/images/apidiff.zip |                   |

@@ -14,17 +14,6 @@ defined by a series of options similar to those supported by `javac`.
 Suitable versions of these dependencies can be downloaded by running
 `make/build.sh`.
 
-### Building with Apache Ant
-
-The default configuration assumes that dependencies have been downloaded
-into the `build/deps` directory.
-These values can be overridden with project-specific local configuration values
-in `build.properties`, if it exists in the root directory of the repo.
-
-````
-    ant -f make/build.xml <target>
-````
-
 ### Building with GNU Make
 
 The default configuration uses values provided in `make/dependencies.gmk`,
