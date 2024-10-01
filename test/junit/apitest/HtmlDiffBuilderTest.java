@@ -53,7 +53,7 @@ import org.junit.jupiter.api.Test;
 import apitest.lib.APITester;
 
 /**
- * Unit tests for the {@code TextDiffBuilder} class.
+ * Unit tests for the {@code HtmlDiffBuilder} class.
  */
 public class HtmlDiffBuilderTest extends APITester {
     /**
