@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2018,2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2018, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -170,10 +170,15 @@ public class Main {
         Selector s = new Selector(options.includes, options.excludes);
         AccessKind ak = options.getAccessKind();
 
+        boolean verboseOptions = options.isVerbose(VerboseKind.OPTIONS);
+        if (verboseOptions) {
+            options.allAPIOptions.values().forEach(a -> a.showVerboseSummary(log));
+        }
+
         // TODO: when APIDiff moves to JDK 21, thia can trivially become SequencedSet,
         //       which would be useful in varoius places, such as PageReporter.getResultGlyph
         Set<API> apis = options.allAPIOptions.values().stream()
-                .map(a -> API.of(a, s, ak, log))
+                .map(a -> API.of(a, s, ak, log, verboseOptions))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
 
         List<Reporter> rList = new ArrayList<>();

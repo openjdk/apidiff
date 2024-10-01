@@ -233,11 +233,11 @@ pairwise, with each of the older instances being compared against the newest ins
 <a id="option-verbose">`--verbose` _flag_[`,`_flag_]*</a>
 :   Specifies the kinds of verbose output. _flag_ may be one of
     `all`, `none`, or one of the following, optionally preceded by `-`:
-    `module`, `package`, `type`, `time`.
+    `module`, `package`, `type`, `time`, `options`.
 
 <a id="option-at">`@`*filename*</a>
 :   Reads options from a file. To shorten or simplify the `apidiff` command, you can specify
-    one or more files that contain arguments for the `apidiff` command. This lets you to create
+    one or more files that contain arguments for the `apidiff` command. This lets you create
     `apidiff` commands of any length on any operating system.
 
 
@@ -419,6 +419,9 @@ If you want to compare the API descriptions as well as the documentation comment
 you can combine the recommended options for the two modes, specifying both
 `--patch-module` options for the source files and `--api-directory` for the
 generated documentation.
+
+If you want to see or understand how the options are used internally, you
+can use `--verbose options`, possibly implicitly as part of `--verbose all`.
 
 ### Comparing different releases of JDK
 
