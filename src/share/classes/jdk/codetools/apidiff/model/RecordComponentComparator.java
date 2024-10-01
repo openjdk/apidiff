@@ -70,8 +70,8 @@ public class RecordComponentComparator extends ElementComparator<Element> {
             allEqual = checkMissing(rcPos, rcMap);
             if (rcMap.size() > 1) {
                 allEqual &= compareSignatures(rcPos, rcMap);
-                allEqual &= compareDocComments(rcPos, rcMap);
-                allEqual &= compareApiDescriptions(rcPos, rcMap);
+                // note that record components do not have distinct API descriptions or doc comments
+                // of their own; they are documented by @param tags in the enclosing element
             }
         } finally {
             reporter.completed(rcPos, allEqual);

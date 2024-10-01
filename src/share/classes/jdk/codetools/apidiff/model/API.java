@@ -58,6 +58,7 @@ import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.ModuleElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.RecordComponentElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
@@ -966,7 +967,16 @@ public abstract class API {
             }
 
             @Override
+            public String visitRecordComponent(RecordComponentElement tpe, APIDocs d) {
+                // record components do not have distinct API descriptions of their own:
+                // they are documented by @param tags in the enclosing element
+                throw new IllegalArgumentException(tpe.getKind() + " " + tpe.getSimpleName());
+            }
+
+            @Override
             public String visitTypeParameter(TypeParameterElement tpe, APIDocs d) {
+                // type parameters do not have distinct API descriptions of their own:
+                // they are documented by @param tags in the enclosing element
                 throw new IllegalArgumentException(tpe.getKind() + " " + tpe.getSimpleName());
             }
 
