@@ -52,13 +52,16 @@ clean:
 
 sanity:
 	@echo "JDKHOME               = $(JDKHOME)"
-	@echo "JUNIT_JAR             = $(JUNIT_JAR)"
-	@echo "JAVADIFFUTILS_JAR     = $(JAVADIFFUTILS_JAR)"
-	@echo "JAVADIFFUTILS_LICENSE = $(JAVADIFFUTILS_LICENSE)"
 	@echo "DAISYDIFF_JAR         = $(DAISYDIFF_JAR)"
+	@echo "DAISYDIFF_SRC         = $(DAISYDIFF_SRC)"
 	@echo "DAISYDIFF_LICENSE     = $(DAISYDIFF_LICENSE)"
+	@echo "EQUINOX_JAR           = $(EQUINOX_JAR)"
+	@echo "EQUINOX_LICENSE       = $(EQUINOX_LICENSE)"
 	@echo "HTMLCLEANER_JAR       = $(HTMLCLEANER_JAR)"
 	@echo "HTMLCLEANER_LICENSE   = $(HTMLCLEANER_LICENSE)"
+	@echo "JAVADIFFUTILS_JAR     = $(JAVADIFFUTILS_JAR)"
+	@echo "JAVADIFFUTILS_LICENSE = $(JAVADIFFUTILS_LICENSE)"
+	@echo "JUNIT_JAR             = $(JUNIT_JAR)"
 
 check-build-vars:
 	@if [ -z "$(JDKHOME)" ]; then \
@@ -69,6 +72,12 @@ check-build-vars:
 	fi
 	@if [ -z "$(DAISYDIFF_LICENSE)" ]; then \
 		echo "DAISYDIFF_LICENSE not set (will not be included)" ; \
+	fi
+	@if [ -z "$(EQUINOX_JAR)" ]; then \
+		echo "EQUINOX_JAR not set" ; exit 1 ; \
+	fi
+	@if [ -z "$(EQUINOX_LICENSE)" ]; then \
+		echo "EQUINOX_LICENSE not set (will not be included)" ; \
 	fi
 	@if [ -z "$(HTMLCLEANER_JAR)" ]; then \
 		echo "HTMLCLEANER_JAR not set" ; exit 1 ; \
