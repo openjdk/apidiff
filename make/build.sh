@@ -665,22 +665,22 @@ cat > ${BUILD_DIR}/make.sh << EOF
 
 # Build apidiff
 cd "${ROOT}/make"
-make BUILDDIR="${BUILD_DIR}"                                  \\
-     BUILD_MILESTONE="${APIDIFF_BUILD_MILESTONE}"             \\
-     BUILD_NUMBER="${APIDIFF_BUILD_NUMBER}"                   \\
-     BUILD_VERSION="${APIDIFF_VERSION}"                       \\
-     BUILD_VERSION_STRING="${APIDIFF_VERSION_STRING}"         \\
-     DAISYDIFF_JAR="$(mixed_path "${DAISYDIFF_JAR:-}")"       \\
-     DAISYDIFF_SRC="$(mixed_path "${DAISYDIFF_SRC:-}")"       \\
-     DAISYDIFF_LICENSE="${DAISYDIFF_LICENSE}"                 \\
-     EQUINOX_JAR="$(mixed_path "${EQUINOX_JAR:-}")"           \\
-     EQUINOX_LICENSE="$(mixed_path "${EQUINOX_LICENSE:-}")"   \\
-     HTMLCLEANER_JAR="${HTMLCLEANER_JAR}"                     \\
-     HTMLCLEANER_LICENSE="${HTMLCLEANER_LICENSE}"             \\
-     JAVADIFFUTILS_JAR="$(mixed_path "${JAVADIFFUTILS_JAR}")" \\
-     JAVADIFFUTILS_LICENSE="${JAVADIFFUTILS_LICENSE}"         \\
-     JDKHOME="${JAVA_HOME}"                                   \\
-     JUNIT_JAR="$(mixed_path "${JUNIT_JAR}")"                 \\
+make BUILDDIR="${BUILD_DIR}"                                            \\
+     BUILD_MILESTONE="${APIDIFF_BUILD_MILESTONE}"                       \\
+     BUILD_NUMBER="${APIDIFF_BUILD_NUMBER}"                             \\
+     BUILD_VERSION="${APIDIFF_VERSION}"                                 \\
+     BUILD_VERSION_STRING="${APIDIFF_VERSION_STRING}"                   \\
+     DAISYDIFF_JAR="$(mixed_path "${DAISYDIFF_JAR:-}")"                 \\
+     DAISYDIFF_SRC="$(mixed_path "${DAISYDIFF_SRC:-}")"                 \\
+     DAISYDIFF_LICENSE="$(mixed_path "${DAISYDIFF_LICENSE:-}")"         \\
+     EQUINOX_JAR="$(mixed_path "${EQUINOX_JAR:-}")"                     \\
+     EQUINOX_LICENSE="$(mixed_path "${EQUINOX_LICENSE:-}")"             \\
+     HTMLCLEANER_JAR="$(mixed_path "${HTMLCLEANER_JAR:-}")"             \\
+     HTMLCLEANER_LICENSE="$(mixed_path "${HTMLCLEANER_LICENSE:-}")"     \\
+     JAVADIFFUTILS_JAR="$(mixed_path "${JAVADIFFUTILS_JAR}")"           \\
+     JAVADIFFUTILS_LICENSE="$(mixed_path "${JAVADIFFUTILS_LICENSE}")"   \\
+     JDKHOME="$(mixed_path ${JAVA_HOME})"                               \\
+     JUNIT_JAR="$(mixed_path "${JUNIT_JAR}")"                           \\
    "\$@"
 EOF
 

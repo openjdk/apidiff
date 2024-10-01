@@ -30,7 +30,11 @@ JUnitTest.add-exports =  \
 		--add-exports jdk.jdeps/com.sun.tools.classfile=ALL-UNNAMED
 
 JUnitTest.classpath = \
-		$(BUILDTESTDIR)/JUnitTests/classes:$(APIDIFF_IMAGEDIR)/lib/apidiff.jar:$(JAVADIFFUTILS_JAR):$(DAISYDIFF_JAR):$(HTMLCLEANER_JAR)
+		$(BUILDTESTDIR)/JUnitTests/classes:$(APIDIFF_IMAGEDIR)/lib/apidiff.jar:$(JAVADIFFUTILS_JAR):$(HTMLCLEANER_JAR):$(EQUINOX_JAR)
+
+ifneq ($(DAISYDIFF_JAR),)
+		JUnitTest.classpath += :$(DAISYDIFF_JAR)
+endif
 
 $(BUILDTESTDIR)/JUnitTests.ok: \
 		$(BUILDTESTDIR)/JUnitTests.classes.ok

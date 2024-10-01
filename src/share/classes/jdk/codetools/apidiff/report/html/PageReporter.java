@@ -36,6 +36,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -862,9 +863,35 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
         return section;
     }
 
-    private static final Content CHECK = HtmlTree.SPAN(Entity.CHECK).setClass("same");
-    private static final Content CROSS = HtmlTree.SPAN(Entity.CROSS).setClass("diff");
-    private static final Content SINGLE = HtmlTree.SPAN(Entity.CIRCLED_DIGIT_ONE).setClass("single");
+    // The following names are intended to be "semantic" or "abstract" names,
+    // distinct from the concrete representations used in the generated documentation.
+    // The names are intentionally different from any corresponding entity names.
+
+    /**
+     * Used when two elements compare as equal.
+     */
+    // possible alternatives: Entity.CHECK
+    private static final Content SAME = HtmlTree.SPAN(Entity.EQUALS).setClass("same");
+    /**
+     * Used when two elements compare as not equal.
+     */
+    // possible alternatives: Entity.CROSS
+    private static final Content DIFFERENT = HtmlTree.SPAN(Entity.NE).setClass("diff");
+    /**
+     * Used when an element does not appear in all instances of the APIs being compared.
+     * See also {@link #ADDED}, {@link #REMOVED}.
+     */
+    private static final Content PARTIAL = HtmlTree.SPAN(Entity.CIRCLED_DIGIT_ONE).setClass("partial");
+    /**
+     * Used in a 2-way comparison when it is determined that an element has been added.
+     */
+    // possible alternatives: '>' (for example, as used in text diff tools) or other right-pointing arrows
+    private static final Content ADDED = HtmlTree.SPAN(Entity.PLUS).setClass("partial");
+    /**
+     * Used in a 2-way comparison when it is determined that an element has been removed.
+     */
+    // possible alternatives: '<' (for example, as used in text diff tools) or other left-pointing arrows
+    private static final Content REMOVED = HtmlTree.SPAN(Entity.MINUS).setClass("partial");
 
 
     protected Content getResultGlyph(ElementKey eKey) {
@@ -882,19 +909,36 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
             return Text.of("?");
         }
         if (map.size() == 1) {
-            return SINGLE;
+            API api = map.keySet().iterator().next();
+            Set<API> apis = parent.apis;
+            if (apis.size() == 2) {
+                // The following assumes an ordering on the order in which the
+                // APIs were defined on the command line: older first, newer second
+                Iterator<API> iter = apis.iterator();
+                API oldAPI = iter.next();
+                API newAPI = iter.next();
+                if (api == oldAPI) { // and not in new API
+                    return REMOVED;
+                } else if (api == newAPI) { // and not in old API
+                    return ADDED;
+                } else {
+                    // should not happen?
+                    return PARTIAL;
+                }
+            }
+            return PARTIAL;
         }
         Boolean eq = results.get(pos);
-        return (eq == null) ? SINGLE : eq ? CHECK : CROSS;
+        return (eq == null) ? PARTIAL : eq ? SAME : DIFFERENT;
     }
 
     // TODO: improve abstraction; these args are typically reversed
     protected Content getResultGlyph(APIMap<?> map, Position pos) {
         if (map.size() == 1) {
-            return SINGLE;
+            return PARTIAL;
         }
         Boolean eq = results.get(pos);
-        return (eq == null) ? SINGLE : eq ? CHECK : CROSS;
+        return (eq == null) ? PARTIAL : eq ? SAME : DIFFERENT;
     }
 
     protected APIMap<? extends Element> getElementMap(ElementKey eKey) {

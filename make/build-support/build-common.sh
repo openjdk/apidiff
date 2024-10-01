@@ -280,7 +280,8 @@ if [ -z "${log_module:-}" ]; then
     exit 1
 fi
 
-ROOT="$(abspath ${ROOT:-${mydir}/..})"
+DEFAULT_ROOT="$(builtin cd ${mydir}/..; pwd)"
+ROOT="$(abspath ${ROOT:-${DEFAULT_ROOT}})"
 BUILD_DIR="$(abspath "${BUILD_DIR:-${ROOT}/build}")"
 DEPS_DIR="${BUILD_DIR}/deps"
 

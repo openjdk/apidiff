@@ -89,6 +89,9 @@ public class TypeParameterComparator extends ElementComparator<TypeParameterElem
         allEquals &= compareNames(pos, map)
                 & compareBounds(pos, map)
                 & new AnnotationComparator(map.keySet(), accessKind, reporter).compareAll(pos, map);
+        // note that type parameters do not have distinct API descriptions or doc comments
+        // of their own; they are documented by @param tags in the enclosing element
+
 
         return allEquals;
     }

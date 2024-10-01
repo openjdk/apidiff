@@ -175,6 +175,8 @@ public class Main {
             options.allAPIOptions.values().forEach(a -> a.showVerboseSummary(log));
         }
 
+        // TODO: when APIDiff moves to JDK 21, thia can trivially become SequencedSet,
+        //       which would be useful in varoius places, such as PageReporter.getResultGlyph
         Set<API> apis = options.allAPIOptions.values().stream()
                 .map(a -> API.of(a, s, ak, log, verboseOptions))
                 .collect(Collectors.toCollection(LinkedHashSet::new));
