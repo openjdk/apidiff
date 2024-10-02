@@ -1,5 +1,5 @@
 #
-# Copyright (c) 1999, 2018, Oracle and/or its affiliates. All rights reserved.
+# Copyright (c) 1999, 2024, Oracle and/or its affiliates. All rights reserved.
 # DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
 #
 # This code is free software; you can redistribute it and/or modify it
@@ -38,9 +38,14 @@ else
 	DAISYDIFF_CLASSPATH_ELEMENT = $(DAISYDIFF_JAR)
 endif
 
+# include EQUINOX_JAR with DAISYDIFF if it is set
+ifneq ($(EQUINOX_JAR),)
+	DAISYDIFF_CLASSPATH_ELEMENT := $(DAISYDIFF_CLASSPATH_ELEMENT):$(EQUINOX_JAR)
+endif
+
 $(BUILDDIR)/classes.jdk.codetools.apidiff.ok: $(JAVAFILES.jdk.codetools.apidiff)
 	$(JAVAC) $(JAVAC_OPTIONS) \
-		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_CLASSPATH_ELEMENT):$(EQUINOX_JAR):$(HTMLCLEANER_JAR) \
+		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_CLASSPATH_ELEMENT):$(HTMLCLEANER_JAR) \
 		-d $(CLASSDIR) \
 		$(JAVAFILES.jdk.codetools.apidiff)
 	echo "classes built at `date`" > $@
@@ -310,7 +315,7 @@ $(BUILDDIR)/api.jdk.codetools.apidiff.ok: \
 	$(JAVADOC) $(JAVADOC_OPTIONS) \
 		-Xdoclint:-missing \
 		-quiet \
-		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_JAR):$(DAISYDIFF_SRC_JAVA):$(EQUINOX_JAR):$(HTMLCLEANER_JAR) \
+		-cp $(JAVADIFFUTILS_JAR):$(DAISYDIFF_CLASSPATH_ELEMENT):$(HTMLCLEANER_JAR) \
 		-overview $(SRCDOCDIR)/overview.html \
 		-linkoffline \
 		    https://docs.oracle.com/en/java/javase/17/docs/api/index.html \
