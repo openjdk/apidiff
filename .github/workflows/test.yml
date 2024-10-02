@@ -8,8 +8,14 @@ on:
 
 jobs:
 
-  linux-x64:
-    runs-on: ubuntu-latest
+  test:
+    name: "Test ApiDiff (JDK-${{ matrix.java }}, ${{ matrix.os }})"
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ ubuntu-latest, macOS-latest, windows-latest ]
+        java: [ 17, 21 ]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: 'Check out repository'
@@ -21,10 +27,12 @@ jobs:
         uses: oracle-actions/setup-java@v1
         with:
           website: oracle.com
-          release: 17
+          release: ${{ matrix.java }}
 
       - name: 'Build ApiDiff'
         shell: bash
-        run: |
-          java --version
-          bash make/build.sh
+        run: bash make/build.sh
+
+      - name: 'Test ApiDiff'
+        shell: bash
+        run: bash make/build.sh --skip-download -- test
