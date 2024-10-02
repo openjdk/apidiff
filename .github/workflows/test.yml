@@ -31,7 +31,10 @@ jobs:
 
       - name: 'Build ApiDiff'
         shell: bash
-        run: bash make/build.sh
+        run: |
+          java --version
+          echo "${{ runner.temp }}/msys64/mingw64/bin" >> $GITHUB_PATH
+          bash make/build.sh
 
       - name: 'Test ApiDiff'
         shell: bash
