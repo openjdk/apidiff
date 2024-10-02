@@ -33,7 +33,7 @@ jobs:
         shell: bash
         run: |
           java --version
-          echo "${{ runner.temp }}/msys64/mingw64/bin" >> $GITHUB_PATH
+          echo "/c/msys64/usr/bin" >> $GITHUB_PATH
           bash make/build.sh
 
       - name: 'Test ApiDiff'
