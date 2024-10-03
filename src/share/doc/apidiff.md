@@ -349,6 +349,13 @@ although that is not a requirement. To eliminate any false positive differences
 being introduced by changes to the `javadoc` tool itself, the same or equivalent
 versions of `javadoc` should be used for each API to be compared.
 
+If you want to compare all the exported packages in a module, use
+`--include <module>/**`.  If you want to compare the contents of
+specific packages in a module, use `--include <module>/<package>.*`
+or `--include <module>/<package>.**`. The `.**` form will also include
+the contents of any subpackages.  You can use multiple `--include`
+options to include different parts of an API in the comparison.
+
 ### Configuring instances of JDK to be compared
 
 `apidiff` can be used to compare different instances of JDK, but that can be
@@ -419,6 +426,15 @@ If you want to compare the API descriptions as well as the documentation comment
 you can combine the recommended options for the two modes, specifying both
 `--patch-module` options for the source files and `--api-directory` for the
 generated documentation.
+
+If you are using the `--jdk-build` option, and the corresponding `images`
+directory has multiple matches for `images/*docs*`, you will need to use
+the `--jdk-docs` option to disambiguate which documentation directory to use.
+The value that you give should be the name of one of those subdirectories
+of the `images` directory. The `--jdk-docs` option is not specific to any
+individual API, and need only be given once on the command-line.
+It will be used as needed to disambiguate the documentation directory to be
+used for any API that is defined by using the `--jdk-build` option.
 
 If you want to see or understand how the options are used internally, you
 can use `--verbose options`, possibly implicitly as part of `--verbose all`.
