@@ -7,37 +7,7 @@ on:
       - pr/*
 
 jobs:
-
-  test:
-    name: "Test ApiDiff (JDK-${{ matrix.java }}, ${{ matrix.os }})"
-    strategy:
-      fail-fast: false
-      matrix:
-        os: [ ubuntu-latest, macOS-latest, windows-latest ]
-        java: [ 17 ]
-    runs-on: ${{ matrix.os }}
-
-    steps:
-      - name: 'Check out repository'
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
-
-      - name: 'Set up Java Development Kit'
-        uses: oracle-actions/setup-java@v1
-        with:
-          website: oracle.com
-          release: ${{ matrix.java }}
-
-      - name: 'Prepare Windows environment'
-        if: runner.os == 'Windows'
-        shell: bash
-        run: echo "/c/msys64/usr/bin" >> $GITHUB_PATH
-
-      - name: 'Build ApiDiff'
-        shell: bash
-        run: bash make/build.sh
-
-      - name: 'Test ApiDiff'
-        shell: bash
-        run: bash make/build.sh --skip-download -- test
+  test-linux:
+    uses: ./.github/workflows/test-linux.yml
+  test-windows:
+    uses: ./.github/workflows/test-windows.yml

@@ -1,0 +1,40 @@
+name: 'Test (windows)'
+
+on:
+  workflow_call:
+
+env:
+  MSYS2_PATH_TYPE: minimal
+  CHERE_INVOKING: 1
+
+jobs:
+  test:
+    name: 'Build and test ApiDiff (windows)'
+    runs-on: windows-latest
+    strategy:
+      fail-fast: false
+    steps:
+      - name: 'Install MSYS2'
+        uses: msys2/setup-msys2@v2.22.0
+        with:
+          install: 'autoconf tar unzip zip make'
+          path-type: minimal
+          location: ${{ runner.tool_cache }}/msys2
+      - name: 'Set MSYS2 path'
+        shell: pwsh
+        run: echo "$env:RUNNER_TOOL_CACHE/msys2/msys64/usr/bin" >> $env:GITHUB_PATH
+      - name: 'Check out repository'
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: 'Set up Java Development Kit'
+        uses: oracle-actions/setup-java@v1
+        with:
+          website: oracle.com
+          release: 17
+      - name: 'Build ApiDiff'
+        shell: bash
+        run: bash make/build.sh
+      - name: 'Test ApiDiff'
+        shell: bash
+        run: bash make/build.sh --skip-download -- test
