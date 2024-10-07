@@ -22,6 +22,8 @@ jobs:
         with:
           install: 'autoconf tar unzip zip make'
           path-type: minimal
+      - name: 'Keep text file line-ending intact'
+        run: git config --global core.autocrlf input
       - name: 'Check out repository'
         uses: actions/checkout@v4
         with:
