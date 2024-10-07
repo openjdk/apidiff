@@ -13,9 +13,6 @@ jobs:
     runs-on: windows-latest
     strategy:
       fail-fast: false
-    defaults:
-      run:
-        shell: msys2 {0}
     steps:
       - name: 'Keep text file line-ending intact'
         run: git config --global core.autocrlf input
@@ -32,6 +29,8 @@ jobs:
           website: oracle.com
           release: 17
       - name: 'Build ApiDiff'
+        shell: msys2 {0}
         run: bash make/build.sh
       - name: 'Test ApiDiff'
+        shell: msys2 {0}
         run: bash make/build.sh --skip-download -- test
