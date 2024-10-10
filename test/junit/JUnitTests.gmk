@@ -41,7 +41,6 @@ $(BUILDTESTDIR)/JUnitTests.ok: \
 	$(RM) $(@:%.ok=%/work) $(@:%.ok=%/report)
 	$(MKDIR) -p $(@:%.ok=%/work) $(@:%.ok=%/report)
 	cd $(@:%.ok=%/work) ; \
-	set -o pipefail ; \
 	$(JAVA) \
 		$(JUnitTest.add-exports) \
 		-jar $(JUNIT_JAR) \
