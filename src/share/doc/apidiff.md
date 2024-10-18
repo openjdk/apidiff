@@ -240,6 +240,18 @@ pairwise, with each of the older instances being compared against the newest ins
     one or more files that contain arguments for the `apidiff` command. This lets you to create
     `apidiff` commands of any length on any operating system.
 
+## Exit Status
+
+`apidiff` exits with one of the following values:
+
+| Exit status | Description                                      |
+|:-----------:|:-------------------------------------------------|
+|      0      | No differences were found                        |
+|      1      | Differences were found                           |
+|      2      | There was an error in the command-line arguments |
+|      3      | An error occurred                                |
+
+The `--help` and `--version` options exit with a status of 0.
 
 ## The Current API
 
