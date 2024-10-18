@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -119,6 +119,33 @@ public class Options {
             fileManagerOpts.computeIfAbsent(opt, _o -> new ArrayList<>()).add(arg);
         }
 
+        public void showVerboseSummary(Log log) {
+            log.err.println("Summary of options for API " + name);
+            if (label != null && !label.equals(name)) {
+                log.err.println("  label: " + label);
+            }
+            if (jdkBuildDir != null) {
+                log.err.println("  [--jdk-build " + jdkBuildDir + "]");
+            }
+            if (!fileManagerOpts.isEmpty()) {
+                fileManagerOpts.forEach((opt, list) -> {
+                    log.err.println("  " + opt + " " + String.join(" ", list));
+                });
+            }
+            if (release != null) {
+                log.err.println("  --release " + release);
+            }
+            if (source != null) {
+                log.err.println("  --source " + source);
+            }
+            if (enablePreview) {
+                log.err.println("  --enable-preview");
+            }
+            if (apiDir != null) {
+                log.err.println("  --api-directory " + apiDir);
+            }
+        }
+
         public String toString() {
             return "APIOptions[name:" + name
                     + ",label:" + label
@@ -202,7 +229,9 @@ public class Options {
         /** Generate messages about missing items. */
         MISSING,
         /** Generate messages about the time taken. */
-        TIME
+        TIME,
+        /** Generate messages about handling the command-line options. */
+        OPTIONS
     }
 
     private Set<VerboseKind> verboseKinds = EnumSet.noneOf(VerboseKind.class);
@@ -210,7 +239,6 @@ public class Options {
     // meta options
     boolean help;
     boolean version;
-    private boolean verbose;
 
     // hidden options
     private Map<String, String> hidden = new HashMap<>();
@@ -437,7 +465,7 @@ public class Options {
          */
         JDK_DOCS("--jdk-docs", "opt.arg.jdk-docs") {
             @Override
-            void process(String opt, String arg, Options options) throws BadOption {
+            void process(String opt, String arg, Options options) {
                 options.jdkDocs = arg;
             }
         },

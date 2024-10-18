@@ -1,4 +1,4 @@
-name: Build and Test ApiDiff
+name: Build and Test APIDiff
 
 on:
   push:
@@ -14,17 +14,17 @@ jobs:
     steps:
       - name: 'Check out repository'
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 1
 
       - name: 'Set up Java Development Kit'
-        uses: oracle-actions/setup-java@v1
+        uses: actions/setup-java@v4
         with:
-          website: oracle.com
-          release: 17
+          distribution: 'oracle'
+          java-version: 17
 
-      - name: 'Build ApiDiff'
+      - name: 'Build APIDiff'
         shell: bash
-        run: |
-          java --version
-          bash make/build.sh
+        run: bash make/build.sh
+
+      - name: 'Self-test APIDiff'
+        shell: bash
+        run: bash make/build.sh --skip-download -- test

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2020, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2020, 2024, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -49,7 +49,7 @@ import jdk.codetools.apidiff.model.SerializedForm;
  */
 public class TestAPI extends API {
     TestAPI(String name) {
-        super(new Options.APIOptions(name), null, null, null);
+        super(new Options.APIOptions(name), null, null, null, false);
     }
 
     @Override
