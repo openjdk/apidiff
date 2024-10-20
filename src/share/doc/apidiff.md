@@ -503,10 +503,12 @@ The tool does _not_ attempt to run `javadoc` locally to generate the page on the
 To compare APIs in the `java.base` module in JDK builds `/local/baseline-jdk` and `/local/updated-jdk`, and place the result in the directory `out`, run the following command:
 
 ```
-bin/apidiff --api jdk \
-    --jdk-build=/local/baseline-jdk/build/linux-x86_64-server-fastdebug --jdk-docs docs \
+bin/apidiff
+    --api jdk \
+    --jdk-build /local/baseline-jdk/build/linux-x86_64-server-fastdebug
     --api sv \
-    --jdk-build=/local/updated-jdk/build/linux-x86_64-server-fastdebug --jdk-docs docs \
+    --jdk-build /local/updated-jdk/build/linux-x86_64-server-fastdebug
+    --jdk-docs docs \
     -d out \
     --compare-api-descriptions true \
     --include 'java.base/**'
