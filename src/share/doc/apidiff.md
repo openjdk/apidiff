@@ -509,3 +509,20 @@ The tool does _not_ attempt to run `javadoc` locally to generate the page on the
 [jdk.compiler]: https://docs.oracle.com/en/java/javase/17/docs/api/jdk.compiler/module-summary.html
 [Java Language Model API]: https://docs.oracle.com/en/java/javase/17/docs/api/java.compiler/javax/lang/model/package-summary.html
 [Compiler Tree API]: https://docs.oracle.com/en/java/javase/17/docs/api/jdk.compiler/com/sun/source/doctree/package-summary.html
+
+## Example
+
+To compare APIs in the `java.base` module in JDK builds `/local/baseline-jdk` and `/local/updated-jdk`, and place the result in the directory `out`, run the following command:
+
+```
+bin/apidiff \
+    --api jdk \
+    --jdk-build /local/baseline-jdk/build/linux-x86_64-server-fastdebug \
+    --api sv \
+    --jdk-build /local/updated-jdk/build/linux-x86_64-server-fastdebug \
+    --jdk-docs docs \
+    -d out \
+    --compare-api-descriptions true \
+    --include 'java.base/**'
+```
+
