@@ -97,7 +97,7 @@ public class Options {
         public String source;
 
         /**
-         * Whether or not {@code --enable-preview} has been specified.
+         * Whether {@code --enable-preview} has been specified.
          */
         public boolean enablePreview;
 
