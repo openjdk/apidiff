@@ -56,7 +56,7 @@ an HTML report.  The comparison includes:
 `apidiff` provides different groups of options, to specify:
 
 * the [APIs](#the-apis) to be compared,
-* the [elements in those APIs](#the-elements-to-be-compared) to be compared,
+* the [elements](#the-elements-to-be-compared) (declarations) in those APIs to be compared,
 * the [output options](#output-options) for the report to be generated, and
 * [other options](#other-options).
 
@@ -380,6 +380,9 @@ For example,
   * `java.compiler/**` matches all packages and types in the `java.compiler`
     module
 
+Depending on how you invoke `apidiff`, you may need to quote the pattern
+to prevent the `*` characters being interpreted by a command shell.
+
 ## Notes
 
 A "notes" file is used to specify links to be injected into the generated report
@@ -660,7 +663,7 @@ using two separate configurations in the same repo, use a command like this:
 apidiff \
     --api jdk24 --jdk-build build/baseline \
     --api 8330183 --jdk-build build/macosx-aarch64-server-release  \
-    --include java.compiler/** \
+    --include 'java.compiler/**' \
     --output-directory build/apidiff
 ```
 
@@ -672,7 +675,7 @@ additional options to be explicit about some of the desired settings.
 apidiff \
     --api jdk24 --jdk-build build/baseline --label "The baseline for the changes"\
     --api 8330183 --jdk-build build/macosx-aarch64-server-release --label "Add SourceVersion.RELEASE_24" \
-    --include java.compiler/** \
+    --include 'java.compiler/**' \
     --output-directory build/apidiff \
     --compare-api-descriptions true \
     --jdk-docs docs \
