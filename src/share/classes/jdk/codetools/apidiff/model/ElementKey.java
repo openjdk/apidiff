@@ -123,6 +123,14 @@ public abstract sealed class ElementKey implements Comparable<ElementKey> {
         return cache.get(e);
     }
 
+    public static ElementKey withReference(TypeElement referenced, Element self) {
+        return switch (self) {
+            case ExecutableElement ee -> new ExecutableElementKey(referenced, ee);
+            case VariableElement ve -> new VariableElementKey(referenced, ve);
+            default -> throw new IllegalArgumentException(self.toString());
+        };
+    }
+
     public final Kind kind;
 
     /**
@@ -580,9 +588,10 @@ public abstract sealed class ElementKey implements Comparable<ElementKey> {
         public final ElementKind elementKind;
         public final Name name;
 
-        protected MemberElementKey(Kind kind, Element e) {
+        // Alternative owner for inherited members
+        protected MemberElementKey(Kind kind, ElementKey ownerKey, Element e) {
             super(kind);
-            this.typeKey = ElementKey.of(e.getEnclosingElement());
+            this.typeKey = ownerKey;
             this.elementKind = e.getKind();
             this.name = e.getSimpleName();
         }
@@ -607,11 +616,15 @@ public abstract sealed class ElementKey implements Comparable<ElementKey> {
         public final List<TypeMirrorKey> params;
         private int hashCode;
 
-        ExecutableElementKey(ExecutableElement ee) {
-            super(Kind.EXECUTABLE, ee);
+        ExecutableElementKey(Element referenced, ExecutableElement ee) {
+            super(Kind.EXECUTABLE, ElementKey.of(referenced), ee);
             params = ee.getParameters().stream()
                     .map(e -> TypeMirrorKey.of(e.asType()))
                     .collect(Collectors.toList());
+        }
+
+        ExecutableElementKey(ExecutableElement ee) {
+            this(ee.getEnclosingElement(), ee);
         }
 
         @Override
@@ -687,8 +700,12 @@ public abstract sealed class ElementKey implements Comparable<ElementKey> {
 
         private int hashCode;
 
+        VariableElementKey(Element referenced, VariableElement ve) {
+            super(Kind.VARIABLE, ElementKey.of(referenced), ve);
+        }
+
         VariableElementKey(VariableElement ve) {
-            super(Kind.VARIABLE, ve);
+            this(ve.getEnclosingElement(), ve);
         }
 
         @Override
