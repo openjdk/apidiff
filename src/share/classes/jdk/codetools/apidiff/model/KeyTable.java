@@ -80,6 +80,19 @@ public class KeyTable<T> {
     }
 
     /**
+     * Puts an item into the table if it does not exist, according to a key and the api in which it is
+     * an instance.
+     *
+     * @param key the key
+     * @param api the api
+     * @param item the item
+     * @return the previous value, if any
+     */
+    public T putIfAbsent(ElementKey key, API api, T item) {
+        return map.computeIfAbsent(key, _k -> APIMap.of()).putIfAbsent(api, item);
+    }
+
+    /**
      * Returns an iterator for the collections of items within the table
      * for a given key.
      *
