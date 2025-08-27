@@ -45,6 +45,7 @@ $(BUILDTESTDIR)/JUnitTests.ok: \
 		$(JUnitTest.add-exports) \
 		-jar $(JUNIT_JAR) \
 		-classpath $(JUnitTest.classpath) \
+			execute
 			--reports-dir=$(@:%.ok=%/report) \
 			--select-package=apitest \
 			2>&1 | tee $(@:%.ok=%/log)
