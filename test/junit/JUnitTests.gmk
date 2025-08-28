@@ -44,11 +44,11 @@ $(BUILDTESTDIR)/JUnitTests.ok: \
 	$(JAVA) \
 		$(JUnitTest.add-exports) \
 		-jar $(JUNIT_JAR) \
-		-classpath $(JUnitTest.classpath) \
-			execute \
+		execute \
+			--class-path $(JUnitTest.classpath) \
 			--reports-dir=$(@:%.ok=%/report) \
 			--select-package=apitest \
-			2>&1 | tee $(@:%.ok=%/log)
+		2>&1 | tee $(@:%.ok=%/log)
 	echo $@ passed at `date` > $@
 
 $(BUILDTESTDIR)/JUnitTests.classes.ok: \
