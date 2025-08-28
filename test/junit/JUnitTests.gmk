@@ -48,6 +48,7 @@ $(BUILDTESTDIR)/JUnitTests.ok: \
 			--class-path $(JUnitTest.classpath) \
 			--reports-dir=$(@:%.ok=%/report) \
 			--select-package=apitest \
+			--fail-if-no-tests \
 		2>&1 | tee $(@:%.ok=%/log)
 	echo $@ passed at `date` > $@
 
