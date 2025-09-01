@@ -27,14 +27,18 @@ package jdk.codetools.apidiff.model;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.PackageElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
 import jdk.codetools.apidiff.Options;
@@ -151,6 +155,8 @@ public class TypeComparator extends ElementComparator<TypeElement> {
                     default -> throw new Error("unexpected element: " + member.getKind() + " " + member);
                 }
             }
+            recurseInheritedFields(api, te, te, fields);
+            recurseInheritedMethods(api, te, te, methods);
         }
 
         Set<API> tMapApis = tMap.keySet();
@@ -165,6 +171,87 @@ public class TypeComparator extends ElementComparator<TypeElement> {
                 & vc.compareAll(fields)
                 & ec.compareAll(constructors)
                 & ec.compareAll(methods);
+    }
+
+    private void recurseInheritedFields(API api, TypeElement initial, TypeElement te, KeyTable<VariableElement> fields) {
+        addLocalFields(api, initial, te, fields);
+        for (var intf : te.getInterfaces()) {
+            var intfElement = (TypeElement) ((DeclaredType) intf).asElement();
+            recurseInheritedFields(api, initial, intfElement, fields);
+        }
+        var superType = te.getSuperclass();
+        if (superType instanceof DeclaredType present) {
+            recurseInheritedFields(api, initial, (TypeElement) present.asElement(), fields);
+        }
+    }
+
+    private void addLocalFields(API api, TypeElement initial, TypeElement te, KeyTable<VariableElement> fields) {
+        if (initial == te)
+            return;
+        for (var member : te.getEnclosedElements()) {
+            // No private member inheritance
+            if (!accessKind.accepts(member) || !canInheritFrom(initial, member)) {
+                continue;
+            }
+            if (member.getKind() == ElementKind.FIELD) {
+                var key = ElementKey.withReference(initial, member);
+                fields.putIfAbsent(key, api, (VariableElement) member);
+            }
+        }
+    }
+
+    private void recurseInheritedMethods(API api, TypeElement initial, TypeElement te, KeyTable<ExecutableElement> methods) {
+        addLocalMethods(api, initial, te, methods);
+        var superType = te.getSuperclass();
+        if (superType instanceof DeclaredType present) {
+            recurseInheritedMethods(api, initial, (TypeElement) present.asElement(), methods);
+        }
+        for (var intf : te.getInterfaces()) {
+            var intfElement = (TypeElement) ((DeclaredType) intf).asElement();
+            recurseInheritedMethods(api, initial, intfElement, methods);
+        }
+    }
+
+    private void addLocalMethods(API api, TypeElement initial, TypeElement te, KeyTable<ExecutableElement> fields) {
+        if (initial == te)
+            return;
+        var isIntf = te.getKind().isInterface();
+        for (var member : te.getEnclosedElements()) {
+            // No private member inheritance
+            if (!accessKind.accepts(member) || !canInheritFrom(initial, member)) {
+                continue;
+            }
+            if (member.getKind() == ElementKind.METHOD) {
+                // No interface static method shadowing
+                if (isIntf && member.getModifiers().contains(Modifier.STATIC))
+                    continue;
+                var key = ElementKey.withReference(initial, member);
+                fields.putIfAbsent(key, api, (ExecutableElement) member);
+            }
+        }
+    }
+
+    /// Whether an element from superEnclosing can be inherited in currentEnclosing
+    public static boolean canInheritFrom(Element currentEnclosing, Element targetElement) {
+        var mods = targetElement.getModifiers();
+        if (mods.contains(Modifier.PUBLIC) || mods.contains(Modifier.PROTECTED))
+            return true;
+        if (mods.contains(Modifier.PRIVATE))
+            return false;
+        return Objects.equals(packageOf(currentEnclosing),
+                              packageOf(targetElement));
+    }
+
+    private static PackageElement packageOf(Element element) {
+        var p = element;
+        while (true) {
+            if (p == null)
+                throw new IllegalArgumentException(String.valueOf(element));
+            if (p.getKind() == ElementKind.PACKAGE) {
+                return (PackageElement) p;
+            }
+            p = p.getEnclosingElement();
+        }
     }
 
     // TODO: in time, the signature of a sealed type may include the sealed modifier
