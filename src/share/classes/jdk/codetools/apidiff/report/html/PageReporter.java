@@ -511,7 +511,32 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
         if (infoText == null) {
             infoText = String.join(" : ", parent.options.getAllAPIOptions().keySet());
         }
-        contents.add(HtmlTree.DIV(new RawHtml(infoText)).setClass("info"));
+        String showUnchangedCheckbox =
+                """
+                <script>
+                    function adjustShowUnchanged() {
+                        if (document.getElementById("show-unchanged-checkbox").checked) {
+                            var unchanged = document.getElementsByClassName("unchanged");
+                            for (var i = 0; i < unchanged.length; i++) {
+                                unchanged[i].classList.remove("hidden");
+                            }
+                        } else {
+                            var unchanged = document.getElementsByClassName("unchanged");
+                            for (var i = 0; i < unchanged.length; i++) {
+                                unchanged[i].classList.add("hidden");
+                            }
+                        }
+                    }
+                    document.addEventListener("DOMContentLoaded", function() {
+                      adjustShowUnchanged();
+                    });
+                </script>
+                <input type='checkbox' id='show-unchanged-checkbox'
+                       onchange='adjustShowUnchanged()'>
+                Show unchanged
+                </input>"
+                """;
+        contents.add(HtmlTree.DIV(new RawHtml(infoText), new RawHtml(showUnchangedCheckbox)).setClass("info"));
         Text index = Text.of(parent.indexPageReporter.getName());
         HtmlTree ul = HtmlTree.UL();
         ul.add(HtmlTree.LI((pageKey == null) ? index : HtmlTree.A(links.getPath("index.html").getPath(), index)));
@@ -751,16 +776,24 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
                 .filter(filter)
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        List<Content> realEnclosed = enclosed.stream().map(eKey -> buildEnclosedElement(eKey)).filter(opt -> opt.isPresent()).map(opt -> opt.orElseThrow()).toList();
-        if (!realEnclosed.isEmpty()) {
+        List<ContentAndResultKind> converted = enclosed.stream().map(eKey -> buildEnclosedElement(eKey)).toList();//.filter(opt -> opt.isPresent()).map(opt -> opt.orElseThrow()).toList();
+
+        if (!converted.isEmpty()) {
+            boolean allUnchanged = converted.stream().allMatch(c -> c.resultKind() == ResultKind.SAME);
             HtmlTree section = HtmlTree.SECTION().setClass("enclosed");
             section.add(HtmlTree.H2(Text.of(msgs.getString(titleKey))));
             HtmlTree ul = HtmlTree.UL();
-            for (Content content : realEnclosed) {
-                HtmlTree li = HtmlTree.LI(content);
+            for (ContentAndResultKind c : converted) {
+                HtmlTree li = HtmlTree.LI(c.content());
+                if (!allUnchanged && c.resultKind() == ResultKind.SAME) {
+                    li.setClass("unchanged");
+                }
                 ul.add(li);
             }
             section.add(ul);
+            if (allUnchanged) {
+                section = HtmlTree.DIV(section).setClass("unchanged");
+            }
             list.add(section);
         }
     }
@@ -774,16 +807,13 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
      *
      * @return the content
      */
-    protected Optional<Content> buildEnclosedElement(ElementKey eKey) {
+    protected ContentAndResultKind buildEnclosedElement(ElementKey eKey) {
         // The enclosed element may be on a different page, so use the appropriate page reporter
         PageReporter<?> r = parent.getPageReporter(eKey);
         ResultKind result = r.getResultGlyph(eKey);
-        if (result == ResultKind.SAME) {
-            return Optional.empty();
-        }
-        return Optional.of(HtmlTree.SPAN(result.getContent(),
+        return new ContentAndResultKind(HtmlTree.SPAN(result.getContent(),
                 Text.SPACE,
-                links.createLink(eKey)));
+                links.createLink(eKey)), result);
     }
 
     protected void addDocFiles(List<Content> list) {
@@ -1622,4 +1652,6 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
             return captionClass;
         }
     }
+
+    protected record ContentAndResultKind(Content content, ResultKind resultKind) {}
 }

@@ -495,4 +495,9 @@ table.summary tfoot th {
      border-top: 1px solid lightgrey;
  }
 
+ .unchanged {
+ }
 
+ .hidden {
+     display: none;
+ }

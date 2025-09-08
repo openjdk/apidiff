@@ -379,7 +379,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
      * @return the content
      */
     @Override
-    protected Optional<Content> buildEnclosedElement(ElementKey eKey) {
+    protected ContentAndResultKind buildEnclosedElement(ElementKey eKey) {
         return switch (eKey.kind) {
             case TYPE -> super.buildEnclosedElement(eKey);
             case EXECUTABLE -> new ExecutableBuilder((ExecutableElementKey) eKey).build();
@@ -553,12 +553,8 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             this.ePos = ePos;
         }
 
-        Optional<Content> build() {
+        ContentAndResultKind build() {
             ResultKind result = getResultGlyph(ePos);
-
-            if (result == ResultKind.SAME) {
-                return Optional.empty();
-            }
 
             Content eq = result.getContent();
 
@@ -620,10 +616,10 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             Content docComments = buildDocComments(ePos);
             Content apiDescriptions = buildAPIDescriptions(ePos);
 
-            return Optional.of(HtmlTree.DIV(eq, buildMissingInfo(ePos), buildNotes(ePos),
+            return new ContentAndResultKind(HtmlTree.DIV(eq, buildMissingInfo(ePos), buildNotes(ePos),
                     signature, docComments, apiDescriptions)
                     .setClass("element")
-                    .set(HtmlAttr.ID, links.getId(ePos)));
+                    .set(HtmlAttr.ID, links.getId(ePos)), result);
         }
 
         private Content buildParameters(Position ePos) {
@@ -759,13 +755,8 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             vPos = Position.of(vKey);
         }
 
-        private Optional<Content> build() {
+        private ContentAndResultKind build() {
             ResultKind result = getResultGlyph(vPos);
-
-            if (result == ResultKind.SAME) {
-                return Optional.empty();
-            }
-
             Content eq = result.getContent();
 
             APIMap<? extends Element> vMap = getElementMap(vKey);
@@ -800,10 +791,10 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             Content docComments = buildDocComments(vPos);
             Content apiDescriptions = buildAPIDescriptions(vPos);
 
-            return Optional.of(HtmlTree.DIV(eq, buildMissingInfo(vPos), buildNotes(vKey),
+            return new ContentAndResultKind(HtmlTree.DIV(eq, buildMissingInfo(vPos), buildNotes(vKey),
                     signature, docComments, apiDescriptions)
                     .setClass("element")
-                    .set(HtmlAttr.ID, links.getId(vKey)));
+                    .set(HtmlAttr.ID, links.getId(vKey)), result);
         }
 
         private Content buildValue(APIMap<? extends Element> vMap) {
@@ -1123,18 +1114,19 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
                 section.add(HtmlTree.H3(Text.of(msgs.getString("serial.serialization-methods"))));
                 HtmlTree ul = HtmlTree.UL();
                 for (Position pos : methods) {
-                    Optional<Content> content = buildSerializedMethod(pos);
-                    if (content.isPresent()) {
-                        HtmlTree li = HtmlTree.LI(content.orElseThrow());
-                        ul.add(li);
+                    ContentAndResultKind content = buildSerializedMethod(pos);
+                    HtmlTree li = HtmlTree.LI(content.content());
+                    if (content.resultKind() == ResultKind.SAME) {
+                        li.setClass("unchanged");
                     }
+                    ul.add(li);
                 }
                 section.add(ul);
                 tree.add(section);
             }
         }
 
-        private Optional<Content> buildSerializedMethod(Position mPos) {
+        private ContentAndResultKind buildSerializedMethod(Position mPos) {
             return new ExecutableBuilder(mPos).build();
         }
 
