@@ -70,6 +70,7 @@ import javax.tools.JavaFileObject;
 
 import com.sun.source.doctree.DocCommentTree;
 import com.sun.source.doctree.DocTree;
+import java.util.Optional;
 import jdk.codetools.apidiff.Abort;
 import jdk.codetools.apidiff.Log;
 import jdk.codetools.apidiff.Messages;
@@ -536,7 +537,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
      */
     protected Content buildPageElement() {
         Position pagePos = Position.of(pageKey);
-        List<Content> prelude = List.of(getResultGlyph(pagePos), buildMissingInfo(pagePos), buildNotes(pageKey));
+        List<Content> prelude = List.of(getResultGlyph(pagePos).getContent(), buildMissingInfo(pagePos), buildNotes(pageKey));
         Content signature = buildSignature();
         return HtmlTree.DIV().setClass("element").add(prelude).add(signature);
     }
@@ -750,12 +751,13 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
                 .filter(filter)
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        if (!enclosed.isEmpty()) {
+        List<Content> realEnclosed = enclosed.stream().map(eKey -> buildEnclosedElement(eKey)).filter(opt -> opt.isPresent()).map(opt -> opt.orElseThrow()).toList();
+        if (!realEnclosed.isEmpty()) {
             HtmlTree section = HtmlTree.SECTION().setClass("enclosed");
             section.add(HtmlTree.H2(Text.of(msgs.getString(titleKey))));
             HtmlTree ul = HtmlTree.UL();
-            for (ElementKey eKey : enclosed) {
-                HtmlTree li = HtmlTree.LI(buildEnclosedElement(eKey));
+            for (Content content : realEnclosed) {
+                HtmlTree li = HtmlTree.LI(content);
                 ul.add(li);
             }
             section.add(ul);
@@ -772,12 +774,16 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
      *
      * @return the content
      */
-    protected Content buildEnclosedElement(ElementKey eKey) {
+    protected Optional<Content> buildEnclosedElement(ElementKey eKey) {
         // The enclosed element may be on a different page, so use the appropriate page reporter
         PageReporter<?> r = parent.getPageReporter(eKey);
-        return HtmlTree.SPAN(r.getResultGlyph(eKey),
+        ResultKind result = r.getResultGlyph(eKey);
+        if (result == ResultKind.SAME) {
+            return Optional.empty();
+        }
+        return Optional.of(HtmlTree.SPAN(result.getContent(),
                 Text.SPACE,
-                links.createLink(eKey));
+                links.createLink(eKey)));
     }
 
     protected void addDocFiles(List<Content> list) {
@@ -792,7 +798,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
             HtmlTree ul = HtmlTree.UL();
             for (RelativePosition<String> p : docFiles) {
                 DocFilesBuilder b = new DocFilesBuilder(p);
-                HtmlTree li = HtmlTree.LI(getResultGlyph(p), buildMissingInfo(p));
+                HtmlTree li = HtmlTree.LI(getResultGlyph(p).getContent(), buildMissingInfo(p));
                 String name = p.index;
                 if (name.endsWith(".html")) {
                     b.buildFile();
@@ -863,50 +869,19 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
         return section;
     }
 
-    // The following names are intended to be "semantic" or "abstract" names,
-    // distinct from the concrete representations used in the generated documentation.
-    // The names are intentionally different from any corresponding entity names.
-
-    /**
-     * Used when two elements compare as equal.
-     */
-    // possible alternatives: Entity.CHECK
-    private static final Content SAME = HtmlTree.SPAN(Entity.EQUALS).setClass("same");
-    /**
-     * Used when two elements compare as not equal.
-     */
-    // possible alternatives: Entity.CROSS
-    private static final Content DIFFERENT = HtmlTree.SPAN(Entity.NE).setClass("diff");
-    /**
-     * Used when an element does not appear in all instances of the APIs being compared.
-     * See also {@link #ADDED}, {@link #REMOVED}.
-     */
-    private static final Content PARTIAL = HtmlTree.SPAN(Entity.CIRCLED_DIGIT_ONE).setClass("partial");
-    /**
-     * Used in a 2-way comparison when it is determined that an element has been added.
-     */
-    // possible alternatives: '>' (for example, as used in text diff tools) or other right-pointing arrows
-    private static final Content ADDED = HtmlTree.SPAN(Entity.PLUS).setClass("partial");
-    /**
-     * Used in a 2-way comparison when it is determined that an element has been removed.
-     */
-    // possible alternatives: '<' (for example, as used in text diff tools) or other left-pointing arrows
-    private static final Content REMOVED = HtmlTree.SPAN(Entity.MINUS).setClass("partial");
-
-
-    protected Content getResultGlyph(ElementKey eKey) {
+    protected ResultKind getResultGlyph(ElementKey eKey) {
         Position pos = Position.of(eKey);
         return getResultGlyph(pos, apiMaps.get(pos));
     }
 
-    protected Content getResultGlyph(Position pos) {
+    protected ResultKind getResultGlyph(Position pos) {
         return getResultGlyph(pos, apiMaps.get(pos));
     }
 
-    protected Content getResultGlyph(Position pos, APIMap<?> map) {
+    protected ResultKind getResultGlyph(Position pos, APIMap<?> map) {
         if (map == null) {
             // TODO...
-            return Text.of("?");
+            return ResultKind.UNKNOWN;
         }
         if (map.size() == 1) {
             API api = map.keySet().iterator().next();
@@ -918,27 +893,27 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
                 API oldAPI = iter.next();
                 API newAPI = iter.next();
                 if (api == oldAPI) { // and not in new API
-                    return REMOVED;
+                    return ResultKind.REMOVED;
                 } else if (api == newAPI) { // and not in old API
-                    return ADDED;
+                    return ResultKind.ADDED;
                 } else {
                     // should not happen?
-                    return PARTIAL;
+                    return ResultKind.PARTIAL;
                 }
             }
-            return PARTIAL;
+            return ResultKind.PARTIAL;
         }
         Boolean eq = results.get(pos);
-        return (eq == null) ? PARTIAL : eq ? SAME : DIFFERENT;
+        return (eq == null) ? ResultKind.PARTIAL : eq ? ResultKind.SAME : ResultKind.DIFFERENT;
     }
 
     // TODO: improve abstraction; these args are typically reversed
-    protected Content getResultGlyph(APIMap<?> map, Position pos) {
+    protected ResultKind getResultGlyph(APIMap<?> map, Position pos) {
         if (map.size() == 1) {
-            return PARTIAL;
+            return ResultKind.PARTIAL;
         }
         Boolean eq = results.get(pos);
-        return (eq == null) ? PARTIAL : eq ? SAME : DIFFERENT;
+        return (eq == null) ? ResultKind.PARTIAL : eq ? ResultKind.SAME : ResultKind.DIFFERENT;
     }
 
     protected APIMap<? extends Element> getElementMap(ElementKey eKey) {
@@ -1498,7 +1473,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
             body.add(buildHeader());
             HtmlTree main = HtmlTree.MAIN();
             main.add(buildPageHeading());
-            main.add(HtmlTree.SPAN(getResultGlyph(fPos), buildMissingInfo(fPos)).setClass("doc-files"));
+            main.add(HtmlTree.SPAN(getResultGlyph(fPos).getContent(), buildMissingInfo(fPos)).setClass("doc-files"));
             main.add(buildDocComments(fPos));
             main.add(buildAPIDescriptions(fPos));
 //            main.add(buildEnclosedElements());
@@ -1592,6 +1567,54 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
 
             return new HtmlTree(TagName.SECTION, HtmlTree.H2(Text.of(name)), ul);
         }
+
+    }
+    public enum ResultKind {
+        UNKNOWN(Text.of("?")),
+        // The following names are intended to be "semantic" or "abstract" names,
+        // distinct from the concrete representations used in the generated documentation.
+        // The names are intentionally different from any corresponding entity names.
+        /**
+         * Used when two elements compare as equal.
+         */
+        // possible alternatives: Entity.CHECK
+        SAME(HtmlTree.SPAN(Entity.EQUALS).setClass("same")),
+
+        /**
+         * Used when two elements compare as not equal.
+         */
+        // possible alternatives: Entity.CROSS
+        DIFFERENT(HtmlTree.SPAN(Entity.NE).setClass("diff")),
+
+        /**
+         * Used when an element does not appear in all instances of the APIs being compared.
+         * See also {@link #ADDED}, {@link #REMOVED}.
+         */
+        PARTIAL(HtmlTree.SPAN(Entity.CIRCLED_DIGIT_ONE).setClass("partial")),
+
+        /**
+         * Used in a 2-way comparison when it is determined that an element has been added.
+         */
+        // possible alternatives: '>' (for example, as used in text diff tools) or other right-pointing arrows
+        ADDED(HtmlTree.SPAN(Entity.PLUS).setClass("partial")),
+
+        /**
+         * Used in a 2-way comparison when it is determined that an element has been removed.
+         */
+        // possible alternatives: '<' (for example, as used in text diff tools) or other left-pointing arrows
+        REMOVED(HtmlTree.SPAN(Entity.MINUS).setClass("partial")),
+        ;
+
+        private final Content content;
+
+        private ResultKind(Content content) {
+            this.content = content;
+        }
+
+        public Content getContent() {
+            return content;
+        }
+
 
     }
 }

@@ -30,6 +30,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -163,7 +164,7 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
     private <T> void addDirectives(List<Content> contents,
                                String headingKey,
                                Predicate<RelativePosition<?>> filter,
-                               BiFunction<RelativePosition<?>, APIMap<T>, Content> f) {
+                               BiFunction<RelativePosition<?>, APIMap<T>, Optional<Content>> f) {
         Map<RelativePosition<?>, APIMap<T>> dMaps = new TreeMap<>(RelativePosition.elementKeyIndexComparator);
         // apiMaps will only contain maps for directives which should be compared and displayed;
         // i.e. they have already been filtered according to accessKind.allDirectiveDetails
@@ -179,27 +180,29 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
             }
         }
 
-        if (!dMaps.isEmpty()) {
+        List<Content> elements = dMaps.entrySet().stream().map(e -> f.apply(e.getKey(), e.getValue())).filter(c -> c.isPresent()).map(opt -> opt.orElseThrow()).toList();
+
+        if (!elements.isEmpty()) {
             HtmlTree section = HtmlTree.SECTION().setClass("enclosed");
             section.add(HtmlTree.H2(Text.of(msgs.getString(headingKey))));
             HtmlTree ul = HtmlTree.UL();
-            dMaps.forEach((rp, apiMap) -> ul.add(HtmlTree.LI(f.apply(rp, apiMap))));
+            elements.forEach(el -> ul.add(HtmlTree.LI(el)));
             section.add(ul);
             contents.add(section);
         }
     }
 
-    private Content buildExports(RelativePosition<?> rPos, APIMap<ExportsDirective> apiMap) {
+    private Optional<Content> buildExports(RelativePosition<?> rPos, APIMap<ExportsDirective> apiMap) {
         return buildExportsOpensProvides(rPos, apiMap, Keywords.EXPORTS, Keywords.TO,
                 ExportsDirective::getPackage, ExportsDirective::getTargetModules);
     }
 
-    private Content buildOpens(RelativePosition<?> rPos, APIMap<OpensDirective> apiMap) {
+    private Optional<Content> buildOpens(RelativePosition<?> rPos, APIMap<OpensDirective> apiMap) {
         return buildExportsOpensProvides(rPos, apiMap, Keywords.OPENS, Keywords.TO,
                 OpensDirective::getPackage, OpensDirective::getTargetModules);
     }
 
-    private Content buildProvides(RelativePosition<?> rPos, APIMap<ProvidesDirective> apiMap) {
+    private Optional<Content> buildProvides(RelativePosition<?> rPos, APIMap<ProvidesDirective> apiMap) {
         // ProvidesDirective is unusual in that part of it (i.e. the implementations)
         // is not part of the public API, and should only be displayed if allDirectiveDetails
         // is true.
@@ -208,13 +211,13 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
                 pd -> allDirectiveDetails ? pd.getImplementations() : Collections.emptyList());
     }
 
-    private Content buildUses(RelativePosition<?> rPos, APIMap<UsesDirective> apiMap) {
+    private Optional<Content> buildUses(RelativePosition<?> rPos, APIMap<UsesDirective> apiMap) {
         return buildExportsOpensProvides(rPos, apiMap, Keywords.USES, Content.empty,
                 UsesDirective::getService, d -> Collections.emptyList());
     }
 
     private <T extends Directive, U extends Element, V extends Element>
-    Content buildExportsOpensProvides(RelativePosition<?> rPos, APIMap<T> apiMap,
+    Optional<Content> buildExportsOpensProvides(RelativePosition<?> rPos, APIMap<T> apiMap,
                                       Content directiveKeyword, Content sublistKeyword,
                                       Function<T, U> getPrimaryElement,
                                       Function<T, List<V>> getSecondaryElements) {
@@ -261,12 +264,17 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
             }
         }
 
+        ResultKind result = getResultGlyph(rPos);
+
+        if (result == ResultKind.SAME) {
+            return Optional.empty();
+        }
 
         // TODO: for now, this is stylistically similar to buildEnclosedElement,
         //       but arguably a better way would be to move code for the check or cross into
         //       the enclosing loop that builds the list.
-        return HtmlTree.SPAN(getResultGlyph(rPos), Text.SPACE)
-                .add(HtmlTree.SPAN(contents).setClass("signature"));
+        return Optional.of(HtmlTree.SPAN(result.getContent(), Text.SPACE)
+                .add(HtmlTree.SPAN(contents).setClass("signature")));
 
     }
 
@@ -288,7 +296,7 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
         }
     }
 
-    private Content buildRequires(RelativePosition<?> rPos, APIMap<RequiresDirective> apiMap) {
+    private Optional<Content> buildRequires(RelativePosition<?> rPos, APIMap<RequiresDirective> apiMap) {
         List<Content> contents = new ArrayList<>();
 
         contents.add(Keywords.REQUIRES);
@@ -337,11 +345,16 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
         // TODO: would be nice to link to the module page if it can be determined to be available.
         contents.add(Text.of(archetype.getDependency().getQualifiedName()));
 
+        ResultKind result = getResultGlyph(rPos);
+
+        if (result == ResultKind.SAME) {
+            return Optional.empty();
+        }
 
         // TODO: for now, this is stylistically similar to buildEnclosedElement,
         //       but arguably a better way would be to move code for the check or cross into
         //       the enclosing loop that builds the list.
-        return HtmlTree.SPAN(getResultGlyph(rPos), Text.SPACE)
-                .add(HtmlTree.SPAN(contents).setClass("signature"));
+        return Optional.of(HtmlTree.SPAN(result.getContent(), Text.SPACE)
+                .add(HtmlTree.SPAN(contents).setClass("signature")));
     }
 }
