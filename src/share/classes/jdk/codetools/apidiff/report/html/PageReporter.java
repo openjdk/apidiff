@@ -840,6 +840,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
      */
     protected Content buildMissingInfo(Position pos) {
         if (missing.containsKey(pos)) {
+            ResultKind result = getResultGlyph(pos);
             // TODO: use an L10N-friendly builder, or use an API list builder, building Content?
             String onlyIn = apiMaps.get(pos).keySet().stream()
                     .map(a -> a.name)
@@ -852,7 +853,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
                     .map(a -> a.name)
                     .collect(Collectors.joining(", "));
             String info = msgs.getString("element.onlyInMissingIn", onlyIn, missingIn);
-            return HtmlTree.SPAN(Text.of(info)).setClass("missing");
+            return HtmlTree.SPAN(Text.of(info)).setClass(result.getCaptionClass() != null ? "missing " + result.getCaptionClass() : "missing");
         } else {
             return Content.empty;
         }
@@ -1570,7 +1571,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
 
     }
     public enum ResultKind {
-        UNKNOWN(Text.of("?")),
+        UNKNOWN(Text.of("?"), null),
         // The following names are intended to be "semantic" or "abstract" names,
         // distinct from the concrete representations used in the generated documentation.
         // The names are intentionally different from any corresponding entity names.
@@ -1578,43 +1579,47 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
          * Used when two elements compare as equal.
          */
         // possible alternatives: Entity.CHECK
-        SAME(HtmlTree.SPAN(Entity.EQUALS).setClass("same")),
+        SAME(HtmlTree.SPAN(Entity.EQUALS).setClass("same"), null),
 
         /**
          * Used when two elements compare as not equal.
          */
         // possible alternatives: Entity.CROSS
-        DIFFERENT(HtmlTree.SPAN(Entity.NE).setClass("diff")),
+        DIFFERENT(HtmlTree.SPAN(Entity.NE).setClass("diff"), null),
 
         /**
          * Used when an element does not appear in all instances of the APIs being compared.
          * See also {@link #ADDED}, {@link #REMOVED}.
          */
-        PARTIAL(HtmlTree.SPAN(Entity.CIRCLED_DIGIT_ONE).setClass("partial")),
+        PARTIAL(HtmlTree.SPAN(Entity.CIRCLED_DIGIT_ONE).setClass("partial"), null),
 
         /**
          * Used in a 2-way comparison when it is determined that an element has been added.
          */
         // possible alternatives: '>' (for example, as used in text diff tools) or other right-pointing arrows
-        ADDED(HtmlTree.SPAN(Entity.PLUS).setClass("add")),
+        ADDED(HtmlTree.SPAN(Entity.PLUS).setClass("add"), "missing-add"),
 
         /**
          * Used in a 2-way comparison when it is determined that an element has been removed.
          */
         // possible alternatives: '<' (for example, as used in text diff tools) or other left-pointing arrows
-        REMOVED(HtmlTree.SPAN(Entity.MINUS).setClass("remove")),
+        REMOVED(HtmlTree.SPAN(Entity.MINUS).setClass("remove"), "missing-remove"),
         ;
 
         private final Content content;
+        private final String captionClass;
 
-        private ResultKind(Content content) {
+        private ResultKind(Content content, String captionClass) {
             this.content = content;
+            this.captionClass = captionClass;
         }
 
         public Content getContent() {
             return content;
         }
 
-
+        public String getCaptionClass() {
+            return captionClass;
+        }
     }
 }

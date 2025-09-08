@@ -214,6 +214,16 @@ div.signature {
     color: #008;
 }
 
+.doc-files span.missing-add, .element span.missing-add, .enclosed span.missing-add, .serial-form span.missing-add {
+    background: #dfd;
+    color: #008;
+}
+
+.doc-files span.missing-remove, .element span.missing-remove, .enclosed span.missing-remove, .serial-form span.missing-remove {
+    background: #fdd;
+    color: #008;
+}
+
 .doc-files span.missing, .element span.missing, .enclosed span.missing, .serial-form span.missing,
 .element span.notes {
     margin-right: 10px;
