@@ -1596,13 +1596,13 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
          * Used in a 2-way comparison when it is determined that an element has been added.
          */
         // possible alternatives: '>' (for example, as used in text diff tools) or other right-pointing arrows
-        ADDED(HtmlTree.SPAN(Entity.PLUS).setClass("partial")),
+        ADDED(HtmlTree.SPAN(Entity.PLUS).setClass("add")),
 
         /**
          * Used in a 2-way comparison when it is determined that an element has been removed.
          */
         // possible alternatives: '<' (for example, as used in text diff tools) or other left-pointing arrows
-        REMOVED(HtmlTree.SPAN(Entity.MINUS).setClass("partial")),
+        REMOVED(HtmlTree.SPAN(Entity.MINUS).setClass("remove")),
         ;
 
         private final Content content;

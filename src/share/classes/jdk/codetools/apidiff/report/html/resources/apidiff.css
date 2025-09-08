@@ -179,7 +179,9 @@ div.signature {
 
 .doc-files span.diff,   .element span.diff,   .enclosed span.diff,   .serial-form span.diff,
 .doc-files span.same,   .element span.same,   .enclosed span.same,   .serial-form span.same,
-.doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial {
+.doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial,
+.doc-files span.add, .element span.add, .enclosed span.add, .serial-form span.add,
+.doc-files span.remove, .element span.remove, .enclosed span.remove, .serial-form span.remove {
     display: inline-block;
     width: 2em;
     margin-right: 0.5ex;
@@ -188,17 +190,27 @@ div.signature {
 }
 
 .doc-files span.diff, .element span.diff, .enclosed span.diff, .serial-form span.diff {
-    background: #fdd;
+    background: #ddf;
     color: #800;
 }
 
 .doc-files span.same, .element span.same, .enclosed span.same, .serial-form span.same {
-    background: #dfd;
+    background: #ddd;
     color: #080;
 }
 
 .doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial {
     background: #ddf;
+    color: #008;
+}
+
+.doc-files span.add, .element span.add, .enclosed span.add, .serial-form span.add {
+    background: #dfd;
+    color: #008;
+}
+
+.doc-files span.remove, .element span.remove, .enclosed span.remove, .serial-form span.remove {
+    background: #fdd;
     color: #008;
 }
 
