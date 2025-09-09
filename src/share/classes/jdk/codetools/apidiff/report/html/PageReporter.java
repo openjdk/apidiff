@@ -511,32 +511,37 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
         if (infoText == null) {
             infoText = String.join(" : ", parent.options.getAllAPIOptions().keySet());
         }
-        String showUnchangedCheckbox =
-                """
-                <script>
-                    function adjustShowUnchanged() {
-                        if (document.getElementById("show-unchanged-checkbox").checked) {
-                            var unchanged = document.getElementsByClassName("unchanged");
-                            for (var i = 0; i < unchanged.length; i++) {
-                                unchanged[i].classList.remove("hidden");
-                            }
-                        } else {
-                            var unchanged = document.getElementsByClassName("unchanged");
-                            for (var i = 0; i < unchanged.length; i++) {
-                                unchanged[i].classList.add("hidden");
+        List<Content> infoBox = new ArrayList<>();
+        infoBox.add(new RawHtml(infoText));
+        if (kind == InfoTextKind.HEADER) {
+            String showUnchangedCheckbox =
+                    """
+                    <script>
+                        function adjustShowUnchanged() {
+                            if (document.getElementById("show-unchanged-checkbox").checked) {
+                                var unchanged = document.getElementsByClassName("unchanged");
+                                for (var i = 0; i < unchanged.length; i++) {
+                                    unchanged[i].classList.remove("hidden");
+                                }
+                            } else {
+                                var unchanged = document.getElementsByClassName("unchanged");
+                                for (var i = 0; i < unchanged.length; i++) {
+                                    unchanged[i].classList.add("hidden");
+                                }
                             }
                         }
-                    }
-                    document.addEventListener("DOMContentLoaded", function() {
-                      adjustShowUnchanged();
-                    });
-                </script>
-                <input type='checkbox' id='show-unchanged-checkbox'
-                       onchange='adjustShowUnchanged()'>
-                Show unchanged
-                </input>"
-                """;
-        contents.add(HtmlTree.DIV(new RawHtml(infoText), new RawHtml(showUnchangedCheckbox)).setClass("info"));
+                        document.addEventListener("DOMContentLoaded", function() {
+                            adjustShowUnchanged();
+                        });
+                    </script>
+                    <input type='checkbox' id='show-unchanged-checkbox'
+                           onchange='adjustShowUnchanged()'>
+                    Show unchanged
+                    </input>
+                    """;
+            infoBox.add(new RawHtml(showUnchangedCheckbox));
+        }
+        contents.add(HtmlTree.DIV(infoBox.toArray(Content[]::new)).setClass("info"));
         Text index = Text.of(parent.indexPageReporter.getName());
         HtmlTree ul = HtmlTree.UL();
         ul.add(HtmlTree.LI((pageKey == null) ? index : HtmlTree.A(links.getPath("index.html").getPath(), index)));

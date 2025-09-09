@@ -193,8 +193,8 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
                 if (!allUnchanged && c.resultKind() == ResultKind.SAME) {
                     item.setClass("unchanged");
                 }
+                ul.add(item);
             }
-            converted.forEach(c -> ul.add());
             section.add(ul);
             if (allUnchanged) {
                 section = HtmlTree.DIV(section).setClass("unchanged");
