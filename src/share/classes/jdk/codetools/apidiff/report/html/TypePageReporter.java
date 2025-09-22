@@ -554,7 +554,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
         }
 
         ContentAndResultKind build() {
-            ResultKind result = getResultGlyph(ePos);
+            ResultKind result = getResultKind(ePos);
 
             Content eq = result.getContent();
 
@@ -756,7 +756,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
         }
 
         private ContentAndResultKind build() {
-            ResultKind result = getResultGlyph(vPos);
+            ResultKind result = getResultKind(vPos);
             Content eq = result.getContent();
 
             APIMap<? extends Element> vMap = getElementMap(vKey);
@@ -990,7 +990,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             }
 
             HtmlTree section = HtmlTree.SECTION(HtmlTree.H2(Text.of(msgs.getString("serial.serialized-form")))).setClass("serial-form");
-            section.add(getResultGlyph(sfPos).getContent()).add(buildMissingInfo(sfPos));
+            section.add(getResultKind(sfPos).getContent()).add(buildMissingInfo(sfPos));
             addSerialVersionUID(section);
             addSerializedFields(section);
             addSerializationMethods(section);
@@ -1004,7 +1004,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             // TODO: weave in the text from serialized-form.html
 
             section.add(HtmlTree.H3(Text.of("serialVersionUID")));
-            section.add(getResultGlyph(uPos).getContent());
+            section.add(getResultKind(uPos).getContent());
             if (differentValues.containsKey(uPos)) {
                 APIMap<Content> alternatives = APIMap.of();
                 values.forEach((api, v) -> alternatives.put(api, Text.of(String.valueOf(v))));
@@ -1061,7 +1061,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
         private Content buildSerializedField(RelativePosition<String> fPos) {
             @SuppressWarnings("unchecked")
             APIMap<SerializedForm.Field> fMap = (APIMap<SerializedForm.Field>) apiMaps.get(fPos);
-            Content glyph = getResultGlyph(fPos).getContent();
+            Content glyph = getResultKind(fPos).getContent();
 
             Content type;
             APIMap<? extends TypeMirror> types;

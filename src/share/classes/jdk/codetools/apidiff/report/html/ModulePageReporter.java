@@ -181,10 +181,15 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
             }
         }
 
-        List<ContentAndResultKind> converted = dMaps.entrySet().stream().map(e -> f.apply(e.getKey(), e.getValue())).toList();
+        List<ContentAndResultKind> converted =
+                dMaps.entrySet()
+                     .stream()
+                     .map(e -> f.apply(e.getKey(), e.getValue()))
+                     .toList();
 
         if (!converted.isEmpty()) {
-            boolean allUnchanged = converted.stream().allMatch(c -> c.resultKind() == ResultKind.SAME);
+            boolean allUnchanged = converted.stream()
+                                            .allMatch(c -> c.resultKind() == ResultKind.SAME);
             HtmlTree section = HtmlTree.SECTION().setClass("enclosed");
             section.add(HtmlTree.H2(Text.of(msgs.getString(headingKey))));
             HtmlTree ul = HtmlTree.UL();
@@ -279,7 +284,7 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
         //       but arguably a better way would be to move code for the check or cross into
         //       the enclosing loop that builds the list.
 
-        ResultKind result = getResultGlyph(rPos);
+        ResultKind result = getResultKind(rPos);
 
         return new ContentAndResultKind(HtmlTree.SPAN(result.getContent(), Text.SPACE)
                 .add(HtmlTree.SPAN(contents).setClass("signature")), result);
@@ -355,7 +360,7 @@ class ModulePageReporter extends PageReporter<ModuleElementKey> {
         // TODO: for now, this is stylistically similar to buildEnclosedElement,
         //       but arguably a better way would be to move code for the check or cross into
         //       the enclosing loop that builds the list.
-        ResultKind result = getResultGlyph(rPos);
+        ResultKind result = getResultKind(rPos);
 
         return new ContentAndResultKind(HtmlTree.SPAN(result.getContent(), Text.SPACE)
                 .add(HtmlTree.SPAN(contents).setClass("signature")), result);

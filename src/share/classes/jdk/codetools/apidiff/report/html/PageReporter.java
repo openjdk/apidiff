@@ -567,7 +567,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
      */
     protected Content buildPageElement() {
         Position pagePos = Position.of(pageKey);
-        List<Content> prelude = List.of(getResultGlyph(pagePos).getContent(), buildMissingInfo(pagePos), buildNotes(pageKey));
+        List<Content> prelude = List.of(PageReporter.this.getResultKind(pagePos).getContent(), buildMissingInfo(pagePos), buildNotes(pageKey));
         Content signature = buildSignature();
         return HtmlTree.DIV().setClass("element").add(prelude).add(signature);
     }
@@ -781,7 +781,10 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
                 .filter(filter)
                 .collect(Collectors.toCollection(TreeSet::new));
 
-        List<ContentAndResultKind> converted = enclosed.stream().map(eKey -> buildEnclosedElement(eKey)).toList();//.filter(opt -> opt.isPresent()).map(opt -> opt.orElseThrow()).toList();
+        List<ContentAndResultKind> converted =
+                enclosed.stream()
+                        .map(eKey -> buildEnclosedElement(eKey))
+                        .toList();
 
         if (!converted.isEmpty()) {
             boolean allUnchanged = converted.stream().allMatch(c -> c.resultKind() == ResultKind.SAME);
@@ -815,7 +818,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
     protected ContentAndResultKind buildEnclosedElement(ElementKey eKey) {
         // The enclosed element may be on a different page, so use the appropriate page reporter
         PageReporter<?> r = parent.getPageReporter(eKey);
-        ResultKind result = r.getResultGlyph(eKey);
+        ResultKind result = r.getResultKind(eKey);
         return new ContentAndResultKind(HtmlTree.SPAN(result.getContent(),
                 Text.SPACE,
                 links.createLink(eKey)), result);
@@ -833,7 +836,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
             HtmlTree ul = HtmlTree.UL();
             for (RelativePosition<String> p : docFiles) {
                 DocFilesBuilder b = new DocFilesBuilder(p);
-                HtmlTree li = HtmlTree.LI(getResultGlyph(p).getContent(), buildMissingInfo(p));
+                HtmlTree li = HtmlTree.LI(PageReporter.this.getResultKind(p).getContent(), buildMissingInfo(p));
                 String name = p.index;
                 if (name.endsWith(".html")) {
                     b.buildFile();
@@ -875,7 +878,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
      */
     protected Content buildMissingInfo(Position pos) {
         if (missing.containsKey(pos)) {
-            ResultKind result = getResultGlyph(pos);
+            ResultKind result = PageReporter.this.getResultKind(pos);
             // TODO: use an L10N-friendly builder, or use an API list builder, building Content?
             String onlyIn = apiMaps.get(pos).keySet().stream()
                     .map(a -> a.name)
@@ -888,7 +891,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
                     .map(a -> a.name)
                     .collect(Collectors.joining(", "));
             String info = msgs.getString("element.onlyInMissingIn", onlyIn, missingIn);
-            return HtmlTree.SPAN(Text.of(info)).setClass(result.getCaptionClass() != null ? "missing " + result.getCaptionClass() : "missing");
+            return HtmlTree.SPAN(Text.of(info)).setClass(result.getMissingCaptionClass() != null ? "missing " + result.getMissingCaptionClass() : "missing");
         } else {
             return Content.empty;
         }
@@ -905,16 +908,16 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
         return section;
     }
 
-    protected ResultKind getResultGlyph(ElementKey eKey) {
+    protected ResultKind getResultKind(ElementKey eKey) {
         Position pos = Position.of(eKey);
-        return getResultGlyph(pos, apiMaps.get(pos));
+        return getResultKind(pos, apiMaps.get(pos));
     }
 
-    protected ResultKind getResultGlyph(Position pos) {
-        return getResultGlyph(pos, apiMaps.get(pos));
+    protected ResultKind getResultKind(Position pos) {
+        return getResultKind(pos, apiMaps.get(pos));
     }
 
-    protected ResultKind getResultGlyph(Position pos, APIMap<?> map) {
+    protected ResultKind getResultKind(Position pos, APIMap<?> map) {
         if (map == null) {
             // TODO...
             return ResultKind.UNKNOWN;
@@ -944,7 +947,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
     }
 
     // TODO: improve abstraction; these args are typically reversed
-    protected ResultKind getResultGlyph(APIMap<?> map, Position pos) {
+    protected ResultKind getResultKind(APIMap<?> map, Position pos) {
         if (map.size() == 1) {
             return ResultKind.PARTIAL;
         }
@@ -1509,7 +1512,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
             body.add(buildHeader());
             HtmlTree main = HtmlTree.MAIN();
             main.add(buildPageHeading());
-            main.add(HtmlTree.SPAN(getResultGlyph(fPos).getContent(), buildMissingInfo(fPos)).setClass("doc-files"));
+            main.add(HtmlTree.SPAN(getResultKind(fPos).getContent(), buildMissingInfo(fPos)).setClass("doc-files"));
             main.add(buildDocComments(fPos));
             main.add(buildAPIDescriptions(fPos));
 //            main.add(buildEnclosedElements());
@@ -1632,29 +1635,29 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
          * Used in a 2-way comparison when it is determined that an element has been added.
          */
         // possible alternatives: '>' (for example, as used in text diff tools) or other right-pointing arrows
-        ADDED(HtmlTree.SPAN(Entity.PLUS).setClass("add"), "missing-add"),
+        ADDED(HtmlTree.SPAN(Entity.PLUS).setClass("add"), "missing-caption-add"),
 
         /**
          * Used in a 2-way comparison when it is determined that an element has been removed.
          */
         // possible alternatives: '<' (for example, as used in text diff tools) or other left-pointing arrows
-        REMOVED(HtmlTree.SPAN(Entity.MINUS).setClass("remove"), "missing-remove"),
+        REMOVED(HtmlTree.SPAN(Entity.MINUS).setClass("remove"), "missing-caption-remove"),
         ;
 
         private final Content content;
-        private final String captionClass;
+        private final String missingCaptionClass;
 
-        private ResultKind(Content content, String captionClass) {
+        private ResultKind(Content content, String missingCaptionClass) {
             this.content = content;
-            this.captionClass = captionClass;
+            this.missingCaptionClass = missingCaptionClass;
         }
 
         public Content getContent() {
             return content;
         }
 
-        public String getCaptionClass() {
-            return captionClass;
+        public String getMissingCaptionClass() {
+            return missingCaptionClass;
         }
     }
 

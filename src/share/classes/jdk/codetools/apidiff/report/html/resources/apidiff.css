@@ -214,12 +214,14 @@ div.signature {
     color: #008;
 }
 
-.doc-files span.missing-add, .element span.missing-add, .enclosed span.missing-add, .serial-form span.missing-add {
+.doc-files span.missing-caption-add, .element span.missing-caption-add,
+.enclosed span.missing-caption-add, .serial-form span.missing-caption-add {
     background: #dfd;
     color: #008;
 }
 
-.doc-files span.missing-remove, .element span.missing-remove, .enclosed span.missing-remove, .serial-form span.missing-remove {
+.doc-files span.missing-caption-remove, .element span.missing-caption-remove,
+.enclosed span.missing-caption-remove, .serial-form span.missing-caption-remove {
     background: #fdd;
     color: #008;
 }
