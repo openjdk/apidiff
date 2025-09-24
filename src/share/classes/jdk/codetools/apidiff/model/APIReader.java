@@ -325,7 +325,7 @@ public class APIReader extends HtmlParser {
                         blockDepth = 0;
                     }
                     debugPrintln(() -> "!! set id for TYPE member " + id);
-                    descriptionId = id;
+                    descriptionId = id.replace("...)", "[])");
                 }
                 break;
         }

@@ -238,6 +238,14 @@ public class APIReaderTest extends APITester {
                              */
                             public void m2() { }
                             /**
+                             * This is first method with varagrs.
+                             */
+                            public void varargs1(Integer i, String... texts) { }
+                            /**
+                             * This is second method with varagrs.
+                             */
+                            public void varargs2(Integer i, int... texts) { }
+                            /**
                              * This is nested class N. This is more test for N.
                              * @see "See Text"
                              */
@@ -367,7 +375,7 @@ public class APIReaderTest extends APITester {
 
             case "C.html" -> {
                 checkDescription(docs.getDescription(), null, null, "This is class C. This is more");
-                checkMemberDescriptions(docs.getMemberDescriptions(), "<init>()", "<init>(int)", "f1", "f2", "m1()", "m2()");
+                checkMemberDescriptions(docs.getMemberDescriptions(), "<init>()", "<init>(int)", "f1", "f2", "m1()", "m2()", "varargs1(java.lang.Integer,java.lang.String[])", "varargs2(java.lang.Integer,int[])");
                 checkDescription(docs.getDescription("<init>()"),
                         "<init>()", "C", "This is the no-args constructor. This is more");
             }
