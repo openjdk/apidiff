@@ -513,7 +513,7 @@ abstract class PageReporter<K extends ElementKey> implements Reporter {
         }
         List<Content> infoBox = new ArrayList<>();
         infoBox.add(new RawHtml(infoText));
-        if (kind == InfoTextKind.HEADER) {
+        if (kind == InfoTextKind.HEADER && !parent.options.showUnchanged()) {
             String showUnchangedCheckbox =
                     """
                     <script>
