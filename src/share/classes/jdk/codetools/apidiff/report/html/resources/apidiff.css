@@ -179,7 +179,9 @@ div.signature {
 
 .doc-files span.diff,   .element span.diff,   .enclosed span.diff,   .serial-form span.diff,
 .doc-files span.same,   .element span.same,   .enclosed span.same,   .serial-form span.same,
-.doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial {
+.doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial,
+.doc-files span.add, .element span.add, .enclosed span.add, .serial-form span.add,
+.doc-files span.remove, .element span.remove, .enclosed span.remove, .serial-form span.remove {
     display: inline-block;
     width: 2em;
     margin-right: 0.5ex;
@@ -188,18 +190,40 @@ div.signature {
 }
 
 .doc-files span.diff, .element span.diff, .enclosed span.diff, .serial-form span.diff {
-    background: #fdd;
-    color: #800;
+    background: #e0e0e0;
+    color: #000;
 }
 
 .doc-files span.same, .element span.same, .enclosed span.same, .serial-form span.same {
-    background: #dfd;
-    color: #080;
+    background: #ffffff;
+    color: #000;
 }
 
 .doc-files span.partial, .element span.partial, .enclosed span.partial, .serial-form span.partial {
     background: #ddf;
-    color: #008;
+    color: #000;
+}
+
+.doc-files span.add, .element span.add, .enclosed span.add, .serial-form span.add {
+    background: #cfc;
+    color: #000;
+}
+
+.doc-files span.remove, .element span.remove, .enclosed span.remove, .serial-form span.remove {
+    background: #fcc;
+    color: #000;
+}
+
+.doc-files span.missing-caption-add, .element span.missing-caption-add,
+.enclosed span.missing-caption-add, .serial-form span.missing-caption-add {
+    background: #cfc;
+    color: #000;
+}
+
+.doc-files span.missing-caption-remove, .element span.missing-caption-remove,
+.enclosed span.missing-caption-remove, .serial-form span.missing-caption-remove {
+    background: #fcc;
+    color: #000;
 }
 
 .doc-files span.missing, .element span.missing, .enclosed span.missing, .serial-form span.missing,
@@ -473,4 +497,9 @@ table.summary tfoot th {
      border-top: 1px solid lightgrey;
  }
 
+ .unchanged {
+ }
 
+ .hidden {
+     display: none;
+ }

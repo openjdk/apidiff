@@ -287,6 +287,11 @@ to repeat these options for each API to be compared.
     <p class="note">This option may be useful when comparing HTML documentation that
     depend on some non-HTML resource files.</p>
 
+<a id="option-show-unchanged">`--show-unchanged` *boolean*</a>
+:   If true, unchanged elements will be show unconditionally. When false or
+    missing, the user viewing the diff will have an option to show or hide the
+    unchanged elements.
+
 ### Other Options
 
 <a id="option-help">`--help`, `-help`, `-h`, `-?`</a>
