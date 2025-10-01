@@ -397,7 +397,7 @@ public class UnchangedTest extends APITester {
             @Override
             public Object visitStartElement(StartElementTree node, Object p) {
                 String name = node.getName().toString();
-                
+
                 if (ELEMENTS_WITH_UNCHANGED_CLASS.contains(name)) {
                     nestedElements.push(new ElementDesc(name, unchanged));
 
@@ -414,7 +414,7 @@ public class UnchangedTest extends APITester {
             @Override
             public Object visitEndElement(EndElementTree node, Object p) {
                 String name = node.getName().toString();
-                
+
                 if (ELEMENTS_WITH_UNCHANGED_CLASS.contains(name)) {
                     ElementDesc removed = nestedElements.pop();
 
@@ -443,7 +443,7 @@ public class UnchangedTest extends APITester {
                 }
                 return null;
             }
-            
+
             record ElementDesc(String name, boolean previousUnchanged) {}
         }.scan(html, null);
 
@@ -504,7 +504,7 @@ public class UnchangedTest extends APITester {
             public boolean delete() {
                 throw new UnsupportedOperationException();
             }
-            
+
         });
         return html;
     }
