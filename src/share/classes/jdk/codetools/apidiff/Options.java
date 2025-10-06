@@ -171,6 +171,7 @@ public class Options {
     Boolean compareDocComments;
     Boolean compareApiDescriptions;
     Boolean compareApiDescriptionsAsText;
+    Boolean showUnchanged;
     String jdkDocs;
 
     // output options
@@ -181,7 +182,6 @@ public class Options {
     Path mainStylesheet;
     List<Path> extraStylesheets;
     List<Path> resourceFiles;
-    boolean showEqual;
 
     /**
      * The position of additional text to be included in the report.
@@ -333,6 +333,16 @@ public class Options {
             @Override
             void process(String opt, String arg, Options options) throws BadOption {
                 options.compareDocComments = asBoolean(arg);
+            }
+        },
+
+        /**
+         * {@code --show-unchanged} <var>boolean-value</var>
+         */
+        SHOW_UNCHANGED("--show-unchanged", "opt.arg.boolean") {
+            @Override
+            void process(String opt, String arg, Options options) throws BadOption {
+                options.showUnchanged = asBoolean(arg);
             }
         },
 
@@ -910,6 +920,15 @@ public class Options {
     }
 
     /**
+     * Returns whether unchanged API elements should be unconditionally shown.
+     *
+     * @return {@code true} if unchanged API elements should be unconditionally shown
+     */
+    public boolean showUnchanged() {
+        return showUnchanged;
+    }
+
+    /**
      * Returns whether documentation comments should be compared.
      *
      * @return {@code true} if documentation comments should be compared
@@ -979,10 +998,6 @@ public class Options {
      */
     public List<Path> getResourceFiles() {
         return (resourceFiles == null) ? Collections.emptyList() : resourceFiles;
-    }
-
-    public boolean showEqual() {
-        return showEqual;
     }
 
     /**
@@ -1080,6 +1095,10 @@ public class Options {
         if (compareDocComments == null) {
             // if not specified explicitly, compare doc comments if not comparing API descriptions
             compareDocComments = !compareApiDescriptions;
+        }
+
+        if (showUnchanged == null) {
+            showUnchanged = false;
         }
 
         if (resourceFiles != null) {

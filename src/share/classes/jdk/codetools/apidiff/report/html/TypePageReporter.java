@@ -32,6 +32,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
@@ -378,7 +379,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
      * @return the content
      */
     @Override
-    protected Content buildEnclosedElement(ElementKey eKey) {
+    protected ContentAndResultKind buildEnclosedElement(ElementKey eKey) {
         return switch (eKey.kind) {
             case TYPE -> super.buildEnclosedElement(eKey);
             case EXECUTABLE -> new ExecutableBuilder((ExecutableElementKey) eKey).build();
@@ -552,8 +553,10 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             this.ePos = ePos;
         }
 
-        Content build() {
-            Content eq = getResultGlyph(ePos);
+        ContentAndResultKind build() {
+            ResultKind result = getResultKind(ePos);
+
+            Content eq = result.getContent();
 
             // TODO: could move to final field
             APIMap<? extends Element> eMap = getElementMap(ePos);
@@ -613,10 +616,10 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             Content docComments = buildDocComments(ePos);
             Content apiDescriptions = buildAPIDescriptions(ePos);
 
-            return HtmlTree.DIV(eq, buildMissingInfo(ePos), buildNotes(ePos),
+            return new ContentAndResultKind(HtmlTree.DIV(eq, buildMissingInfo(ePos), buildNotes(ePos),
                     signature, docComments, apiDescriptions)
                     .setClass("element")
-                    .set(HtmlAttr.ID, links.getId(ePos));
+                    .set(HtmlAttr.ID, links.getId(ePos)), result);
         }
 
         private Content buildParameters(Position ePos) {
@@ -752,8 +755,9 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             vPos = Position.of(vKey);
         }
 
-        private Content build() {
-            Content eq = getResultGlyph(vPos);
+        private ContentAndResultKind build() {
+            ResultKind result = getResultKind(vPos);
+            Content eq = result.getContent();
 
             APIMap<? extends Element> vMap = getElementMap(vKey);
             // by design, they should all have the same ElementKind,
@@ -787,10 +791,10 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             Content docComments = buildDocComments(vPos);
             Content apiDescriptions = buildAPIDescriptions(vPos);
 
-            return HtmlTree.DIV(eq, buildMissingInfo(vPos), buildNotes(vKey),
+            return new ContentAndResultKind(HtmlTree.DIV(eq, buildMissingInfo(vPos), buildNotes(vKey),
                     signature, docComments, apiDescriptions)
                     .setClass("element")
-                    .set(HtmlAttr.ID, links.getId(vKey));
+                    .set(HtmlAttr.ID, links.getId(vKey)), result);
         }
 
         private Content buildValue(APIMap<? extends Element> vMap) {
@@ -986,7 +990,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             }
 
             HtmlTree section = HtmlTree.SECTION(HtmlTree.H2(Text.of(msgs.getString("serial.serialized-form")))).setClass("serial-form");
-            section.add(getResultGlyph(sfPos)).add(buildMissingInfo(sfPos));
+            section.add(getResultKind(sfPos).getContent()).add(buildMissingInfo(sfPos));
             addSerialVersionUID(section);
             addSerializedFields(section);
             addSerializationMethods(section);
@@ -1000,7 +1004,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             // TODO: weave in the text from serialized-form.html
 
             section.add(HtmlTree.H3(Text.of("serialVersionUID")));
-            section.add(getResultGlyph(uPos));
+            section.add(getResultKind(uPos).getContent());
             if (differentValues.containsKey(uPos)) {
                 APIMap<Content> alternatives = APIMap.of();
                 values.forEach((api, v) -> alternatives.put(api, Text.of(String.valueOf(v))));
@@ -1057,7 +1061,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
         private Content buildSerializedField(RelativePosition<String> fPos) {
             @SuppressWarnings("unchecked")
             APIMap<SerializedForm.Field> fMap = (APIMap<SerializedForm.Field>) apiMaps.get(fPos);
-            Content glyph = getResultGlyph(fPos);
+            Content glyph = getResultKind(fPos).getContent();
 
             Content type;
             APIMap<? extends TypeMirror> types;
@@ -1110,7 +1114,11 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
                 section.add(HtmlTree.H3(Text.of(msgs.getString("serial.serialization-methods"))));
                 HtmlTree ul = HtmlTree.UL();
                 for (Position pos : methods) {
-                    HtmlTree li = HtmlTree.LI(buildSerializedMethod(pos));
+                    ContentAndResultKind content = buildSerializedMethod(pos);
+                    HtmlTree li = HtmlTree.LI(content.content());
+                    if (content.resultKind() == ResultKind.SAME) {
+                        li.setClass("unchanged");
+                    }
                     ul.add(li);
                 }
                 section.add(ul);
@@ -1118,7 +1126,7 @@ class TypePageReporter extends PageReporter<TypeElementKey> {
             }
         }
 
-        private Content buildSerializedMethod(Position mPos) {
+        private ContentAndResultKind buildSerializedMethod(Position mPos) {
             return new ExecutableBuilder(mPos).build();
         }
 
