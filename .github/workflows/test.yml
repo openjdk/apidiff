@@ -21,7 +21,7 @@ jobs:
         uses: actions/setup-java@v5
         with:
           distribution: 'oracle'
-          java-version: 25
+          java-version: 21
 
       - name: 'Build APIDiff'
         shell: bash
