@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2019, Oracle and/or its affiliates. All rights reserved.
+ * Copyright (c) 2019, 2026, Oracle and/or its affiliates. All rights reserved.
  * DO NOT ALTER OR REMOVE COPYRIGHT NOTICES OR THIS FILE HEADER.
  *
  * This code is free software; you can redistribute it and/or modify it
@@ -208,6 +208,18 @@ public class HtmlDiffBuilderTest extends APITester {
         test(getScratchDir(), list1, list2);
     }
 
+    /**
+     * Tests the behavior if a details element appears in a description list.
+     *
+     * @throws IOException if an IO exception occurs
+     */
+    @Test
+    public void testDetailsInDescriptionList() throws IOException {
+        String html1 = "<dl><dd><details><summary>more</summary>1</details></dd></dl>";
+        String html2 = html1.replace("1", "2");
+        test(getScratchDir(), html1, html2);
+    }
+
     void test(Path dir, List<String> list1, List<String> list2) throws IOException {
         test(dir, String.join("<br>\n", list1), String.join("<br>\n", list2));
     }
@@ -216,7 +228,7 @@ public class HtmlDiffBuilderTest extends APITester {
         try (PrintWriter out = wrap(System.out); PrintWriter err = wrap(System.err)) {
             APIMap<String> apiMap = APIMap.of();
             apiMap.put(new TestAPI("api1"), html1);
-            apiMap.put(new TestAPI("api2"), html1);
+            apiMap.put(new TestAPI("api2"), html2);
             Log log = new Log(out, err);
             Messages msgs = Messages.instance("jdk.codetools.apidiff.report.html.resources.report");
             HtmlDiffBuilder b = new HtmlDiffBuilder(apiMap.keySet(), log, msgs);
